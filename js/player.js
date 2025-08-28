@@ -161,7 +161,7 @@ function initializePageContent() {
     }
 
     // 保存当前视频URL
-    currentVideoUrl = videoUrl ? `${PROXY_URL}?url=${encodeURIComponent(videoUrl)}` : '';
+    currentVideoUrl = videoUrl ? `${PASS_URL}?url=${encodeURIComponent(videoUrl)}` : '';
 
     // 从localStorage获取数据
     currentVideoTitle = title || localStorage.getItem('currentVideoTitle') || '未知视频';
