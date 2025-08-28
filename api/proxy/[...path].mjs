@@ -23,16 +23,16 @@ try {
         // 检查解析结果是否为非空数组
         if (Array.isArray(parsedAgents) && parsedAgents.length > 0) {
             USER_AGENTS = parsedAgents; // 使用环境变量中的数组
-            console.log(`[代理日志] 已从环境变量加载 ${USER_AGENTS.length} 个 User Agent。`);
+            console.log(`[代理日誌] 已從環境變數載入 ${USER_AGENTS.length} 个 User Agent。`);
         } else {
-            console.warn("[代理日志] 环境变量 USER_AGENTS_JSON 不是有效的非空数组，使用默认值。");
+            console.warn("[代理日誌] 環境變數 USER_AGENTS_JSON 不是有效的非空數組，使用預設值。");
         }
     } else {
-        console.log("[代理日志] 未设置环境变量 USER_AGENTS_JSON，使用默认 User Agent。");
+        console.log("[代理日誌] 未設定環境變數 USER_AGENTS_JSON，使用預設 User Agent。");
     }
 } catch (e) {
     // 如果 JSON 解析失败，记录错误并使用默认值
-    console.error(`[代理日志] 解析环境变量 USER_AGENTS_JSON 出错: ${e.message}。使用默认 User Agent。`);
+    console.error(`[代理日志] 解析環境變數 USER_AGENTS_JSON 出错: ${e.message}。使用預設 User Agent。`);
 }
 
 // 广告过滤在代理中禁用，由播放器处理
@@ -43,7 +43,7 @@ const FILTER_DISCONTINUITY = false;
 
 function logDebug(message) {
     if (DEBUG_ENABLED) {
-        console.log(`[代理日志] ${message}`);
+        console.log(`[代理日誌] ${message}`);
     }
 }
 
@@ -54,7 +54,7 @@ function logDebug(message) {
  */
 function getTargetUrlFromPath(encodedPath) {
     if (!encodedPath) {
-        logDebug("getTargetUrlFromPath 收到空路径。");
+        logDebug("getTargetUrlFromPath 收到空路徑。");
         return null;
     }
     try {
@@ -66,14 +66,14 @@ function getTargetUrlFromPath(encodedPath) {
             logDebug(`无效的解码 URL 格式: ${decodedUrl}`);
             // 备选检查：原始路径是否未编码但看起来像 URL？
             if (encodedPath.match(/^https?:\/\/.+/i)) {
-                logDebug(`警告: 路径未编码但看起来像 URL: ${encodedPath}`);
+                logDebug(`警告: 路徑未編碼但看起来像 URL: ${encodedPath}`);
                 return encodedPath;
             }
             return null;
         }
     } catch (e) {
         // 捕获解码错误 (例如格式错误的 URI)
-        logDebug(`解码目标 URL 出错: ${encodedPath} - ${e.message}`);
+        logDebug(`解碼目標 URL 出錯: ${encodedPath} - ${e.message}`);
         return null;
     }
 }
@@ -111,7 +111,7 @@ function resolveUrl(baseUrl, relativeUrl) {
         // 使用 Node.js 的 URL 构造函数处理相对路径
         return new URL(relativeUrl, baseUrl).toString();
     } catch (e) {
-        logDebug(`URL 解析失败: base="${baseUrl}", relative="${relativeUrl}". 错误: ${e.message}`);
+        logDebug(`URL 解析失敗: base="${baseUrl}", relative="${relativeUrl}". 錯誤: ${e.message}`);
         // 简单的备用逻辑
         if (relativeUrl.startsWith('/')) {
              try {
@@ -148,7 +148,7 @@ async function fetchContentWithType(targetUrl, requestHeaders) {
     // 清理空值的头
     Object.keys(headers).forEach(key => headers[key] === undefined || headers[key] === null || headers[key] === '' ? delete headers[key] : {});
 
-    logDebug(`准备请求目标: ${targetUrl}，请求头: ${JSON.stringify(headers)}`);
+    logDebug(`準備請求目標: ${targetUrl}，請求頭: ${JSON.stringify(headers)}`);
 
     try {
         // 发起 fetch 请求
@@ -167,7 +167,7 @@ async function fetchContentWithType(targetUrl, requestHeaders) {
         // 读取响应内容
         const content = await response.text();
         const contentType = response.headers.get('content-type') || '';
-        logDebug(`请求成功: ${targetUrl}, Content-Type: ${contentType}, 内容长度: ${content.length}`);
+        logDebug(`請求成功: ${targetUrl}, Content-Type: ${contentType}, 内容長度: ${content.length}`);
         // 返回结果
         return { content, contentType, responseHeaders: response.headers };
 
@@ -175,7 +175,7 @@ async function fetchContentWithType(targetUrl, requestHeaders) {
         // 捕获 fetch 本身的错误（网络、超时等）或上面抛出的 HTTP 错误
         logDebug(`请求异常 ${targetUrl}: ${error.message}`);
         // 重新抛出，确保包含原始错误信息
-        throw new Error(`请求目标 URL 失败 ${targetUrl}: ${error.message}`);
+        throw new Error(`請求目標 URL 失敗 ${targetUrl}: ${error.message}`);
     }
 }
 
@@ -189,7 +189,7 @@ function isM3u8Content(content, contentType) {
 function processKeyLine(line, baseUrl) {
     return line.replace(/URI="([^"]+)"/, (match, uri) => {
         const absoluteUri = resolveUrl(baseUrl, uri);
-        logDebug(`处理 KEY URI: 原始='${uri}', 绝对='${absoluteUri}'`);
+        logDebug(`處理 KEY URI: 原始='${uri}', 絕對='${absoluteUri}'`);
         return `URI="${rewriteUrlToProxy(absoluteUri)}"`;
     });
 }
@@ -197,7 +197,7 @@ function processKeyLine(line, baseUrl) {
 function processMapLine(line, baseUrl) {
      return line.replace(/URI="([^"]+)"/, (match, uri) => {
         const absoluteUri = resolveUrl(baseUrl, uri);
-        logDebug(`处理 MAP URI: 原始='${uri}', 绝对='${absoluteUri}'`);
+        logDebug(`處理 MAP URI: 原始='${uri}', 絕對='${absoluteUri}'`);
         return `URI="${rewriteUrlToProxy(absoluteUri)}"`;
      });
  }
@@ -205,7 +205,7 @@ function processMapLine(line, baseUrl) {
 function processMediaPlaylist(url, content) {
     const baseUrl = getBaseUrl(url);
     if (!baseUrl) {
-        logDebug(`无法确定媒体列表的 Base URL: ${url}，相对路径可能无法处理。`);
+        logDebug(`無法確定媒體清單的 Base URL: ${url}，相對路徑可能無法處理。`);
     }
     const lines = content.split('\n');
     const output = [];
