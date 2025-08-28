@@ -8,16 +8,16 @@ async function handleApiRequest(url) {
         if (url.pathname === '/api/search') {
             const searchQuery = url.searchParams.get('wd');
             if (!searchQuery) {
-                throw new Error('缺少搜索参数');
+                throw new Error('缺少搜尋參數');
             }
             
             // 验证API和source的有效性
             if (source === 'custom' && !customApi) {
-                throw new Error('使用自定义API时必须提供API地址');
+                throw new Error('使用自定義API時必須提供API地址');
             }
             
             if (!API_SITES[source] && source !== 'custom') {
-                throw new Error('无效的API来源');
+                throw new Error('無效的API來源');
             }
             
             const apiUrl = customApi
@@ -42,19 +42,19 @@ async function handleApiRequest(url) {
                 clearTimeout(timeoutId);
                 
                 if (!response.ok) {
-                    throw new Error(`API请求失败: ${response.status}`);
+                    throw new Error(`API請求失敗: ${response.status}`);
                 }
                 
                 const data = await response.json();
                 
                 // 检查JSON格式的有效性
                 if (!data || !Array.isArray(data.list)) {
-                    throw new Error('API返回的数据格式无效');
+                    throw new Error('API返回的數據格式無效');
                 }
                 
                 // 添加源信息到每个结果
                 data.list.forEach(item => {
-                    item.source_name = source === 'custom' ? '自定义源' : API_SITES[source].name;
+                    item.source_name = source === 'custom' ? '自定義源' : API_SITES[source].name;
                     item.source_code = source;
                     // 对于自定义源，添加API URL信息
                     if (source === 'custom') {
@@ -78,21 +78,21 @@ async function handleApiRequest(url) {
             const sourceCode = url.searchParams.get('source') || 'heimuer'; // 获取源代码
             
             if (!id) {
-                throw new Error('缺少视频ID参数');
+                throw new Error('缺少影片ID參數');
             }
             
             // 验证ID格式 - 只允许数字和有限的特殊字符
             if (!/^[\w-]+$/.test(id)) {
-                throw new Error('无效的视频ID格式');
+                throw new Error('無效的影片ID格式');
             }
 
             // 验证API和source的有效性
             if (sourceCode === 'custom' && !customApi) {
-                throw new Error('使用自定义API时必须提供API地址');
+                throw new Error('使用自定義API時必須提供API地址');
             }
             
             if (!API_SITES[sourceCode] && sourceCode !== 'custom') {
-                throw new Error('无效的API来源');
+                throw new Error('無效的API来源');
             }
 
             // 对于有detail参数的源，都使用特殊处理方式
@@ -131,7 +131,7 @@ async function handleApiRequest(url) {
                 clearTimeout(timeoutId);
                 
                 if (!response.ok) {
-                    throw new Error(`详情请求失败: ${response.status}`);
+                    throw new Error(`詳情請求失敗: ${response.status}`);
                 }
                 
                 // 解析JSON
@@ -139,7 +139,7 @@ async function handleApiRequest(url) {
                 
                 // 检查返回的数据是否有效
                 if (!data || !data.list || !Array.isArray(data.list) || data.list.length === 0) {
-                    throw new Error('获取到的详情内容无效');
+                    throw new Error('獲取到的詳情内容無效');
                 }
                 
                 // 获取第一个匹配的视频详情
@@ -187,7 +187,7 @@ async function handleApiRequest(url) {
                         actor: videoDetail.vod_actor,
                         remarks: videoDetail.vod_remarks,
                         // 添加源信息
-                        source_name: sourceCode === 'custom' ? '自定义源' : API_SITES[sourceCode].name,
+                        source_name: sourceCode === 'custom' ? '自定義源' : API_SITES[sourceCode].name,
                         source_code: sourceCode
                     }
                 });
@@ -199,10 +199,10 @@ async function handleApiRequest(url) {
 
         throw new Error('未知的API路径');
     } catch (error) {
-        console.error('API处理错误:', error);
+        console.error('API處理錯誤:', error);
         return JSON.stringify({
             code: 400,
-            msg: error.message || '请求处理失败',
+            msg: error.message || '請求處理失敗',
             list: [],
             episodes: [],
         });
@@ -235,7 +235,7 @@ async function handleCustomApiSpecialDetail(id, customApi) {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-            throw new Error(`自定义API详情页请求失败: ${response.status}`);
+            throw new Error(`自定義API詳情頁請求失敗: ${response.status}`);
         }
         
         // 获取HTML内容
@@ -266,12 +266,12 @@ async function handleCustomApiSpecialDetail(id, customApi) {
             videoInfo: {
                 title: titleText,
                 desc: descText,
-                source_name: '自定义源',
+                source_name: '自定義源',
                 source_code: 'custom'
             }
         });
     } catch (error) {
-        console.error(`自定义API详情获取失败:`, error);
+        console.error(`自定義API詳情獲取失敗:`, error);
         throw error;
     }
 }
@@ -302,7 +302,7 @@ async function handleSpecialSourceDetail(id, sourceCode) {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-            throw new Error(`详情页请求失败: ${response.status}`);
+            throw new Error(`詳情頁請求失敗: ${response.status}`);
         }
         
         // 获取HTML内容
@@ -350,7 +350,7 @@ async function handleSpecialSourceDetail(id, sourceCode) {
             }
         });
     } catch (error) {
-        console.error(`${API_SITES[sourceCode].name}详情获取失败:`, error);
+        console.error(`${API_SITES[sourceCode].name}詳情獲取失敗:`, error);
         throw error;
     }
 }
@@ -373,7 +373,7 @@ async function handleAggregatedSearch(searchQuery) {
             
             // 使用Promise.race添加超时处理
             const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error(`${source}源搜索超时`)), 8000)
+                setTimeout(() => reject(new Error(`${source}源搜索超時`)), 8000)
             );
             
             // 添加鉴权参数到代理URL
@@ -388,13 +388,13 @@ async function handleAggregatedSearch(searchQuery) {
             const response = await Promise.race([fetchPromise, timeoutPromise]);
             
             if (!response.ok) {
-                throw new Error(`${source}源请求失败: ${response.status}`);
+                throw new Error(`${source}源請求失敗: ${response.status}`);
             }
             
             const data = await response.json();
             
             if (!data || !Array.isArray(data.list)) {
-                throw new Error(`${source}源返回的数据格式无效`);
+                throw new Error(`${source}源返回的數據格式無效`);
             }
             
             // 为搜索结果添加源信息
