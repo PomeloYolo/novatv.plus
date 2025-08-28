@@ -94,32 +94,6 @@ let currentVideoUrl = ''; // 记录当前实际的视频URL
 const isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function')
 Artplayer.FULLSCREEN_WEB_IN_BODY = true;
 
-// 假設 currentVideoUrl 已經是你要播放的影片
-function initPlayer(url) {
-    if (art) {
-        art.destroy();
-        art = null;
-    }
-
-    art = new Artplayer({
-        container: '#player',
-        url: url,
-        autoplay: true,
-        mutex: true,
-        volume: 0.7,
-        playsinline: true,
-        settings: [],
-    });
-
-    // 監聽播放錯誤
-    art.on('error', () => {
-        console.warn('播放錯誤，自動跳轉原始連結：', url);
-
-        // 跳轉到影片原始連結（不經過 Worker 代理）
-        const originalUrl = decodeURIComponent(new URL(url).searchParams.get('url')) || url;
-        window.location.href = originalUrl;
-    });
-}
 
 // 初始化播放器
 initPlayer(currentVideoUrl);
@@ -191,9 +165,25 @@ function initializePageContent() {
     }
 
     // 保存当前视频URL
-    currentVideoUrl = videoUrl ? `${PASS_URL}?url=${encodeURIComponent(videoUrl)}` : '';
+    currentVideoUrl = videoUrl || '';
 
-    // 从localStorage获取数据
+    // 直接跳轉播放（替代 ArtPlayer 播放器）
+    if (currentVideoUrl) {
+        const playerContainer = document.getElementById('playerContainer');
+        playerContainer.innerHTML = `
+            <div class="redirect-message text-center text-white py-8">
+                <p>正在跳轉到影片播放頁面...</p>
+                <a href="${currentVideoUrl}" target="_blank" class="text-blue-400 hover:underline">如果沒有自動跳轉，請點此播放影片</a>
+            </div>
+        `;
+
+        // 自動跳轉
+        window.location.href = currentVideoUrl;
+    }
+
+    // 後面不要再用代理 URL，直接使用原始 URL
+    // currentVideoUrl = videoUrl ? `${PASS_URL}?url=${encodeURIComponent(videoUrl)}` : '';
+
     currentVideoTitle = title || localStorage.getItem('currentVideoTitle') || '未知视频';
     currentEpisodeIndex = index;
 
