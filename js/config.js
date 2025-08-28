@@ -93,11 +93,11 @@ const PLAYER_CONFIG = {
 
 // 增加错误信息本地化
 const ERROR_MESSAGES = {
-    NETWORK_ERROR: '网络连接错误，请检查网络设置',
-    TIMEOUT_ERROR: '请求超时，服务器响应时间过长',
-    API_ERROR: 'API接口返回错误，请尝试更换数据源',
+    NETWORK_ERROR: '網路連接錯誤，請檢察網路配置',
+    TIMEOUT_ERROR: '請求超時，請稍後再試',
+    API_ERROR: 'API接口返回錯誤，請更換',
     PLAYER_ERROR: '播放器加载失败，请尝试其他视频源',
-    UNKNOWN_ERROR: '发生未知错误，请刷新页面重试'
+    UNKNOWN_ERROR: '發生未知錯誤，請重新載入'
 };
 
 // 添加进一步安全设置
