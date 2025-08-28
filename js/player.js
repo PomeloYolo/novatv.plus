@@ -94,6 +94,36 @@ let currentVideoUrl = ''; // 记录当前实际的视频URL
 const isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function')
 Artplayer.FULLSCREEN_WEB_IN_BODY = true;
 
+// 假設 currentVideoUrl 已經是你要播放的影片
+function initPlayer(url) {
+    if (art) {
+        art.destroy();
+        art = null;
+    }
+
+    art = new Artplayer({
+        container: '#player',
+        url: url,
+        autoplay: true,
+        mutex: true,
+        volume: 0.7,
+        playsinline: true,
+        settings: [],
+    });
+
+    // 監聽播放錯誤
+    art.on('error', () => {
+        console.warn('播放錯誤，自動跳轉原始連結：', url);
+
+        // 跳轉到影片原始連結（不經過 Worker 代理）
+        const originalUrl = decodeURIComponent(new URL(url).searchParams.get('url')) || url;
+        window.location.href = originalUrl;
+    });
+}
+
+// 初始化播放器
+initPlayer(currentVideoUrl);
+
 // 页面加载
 document.addEventListener('DOMContentLoaded', function () {
     // 先检查用户是否已通过密码验证
