@@ -98,7 +98,7 @@ function validateAuth(event) {
     // 获取服务器端密码哈希
     const serverPassword = process.env.PASSWORD;
     if (!serverPassword) {
-        console.error('服务器未设置 PASSWORD 环境变量，代理访问被拒绝');
+        console.error('伺服器未設置 PASSWORD 環境變數，代理訪問被拒絕');
         return false;
     }
     
@@ -106,7 +106,7 @@ function validateAuth(event) {
     const serverPasswordHash = crypto.createHash('sha256').update(serverPassword).digest('hex');
     
     if (!authHash || authHash !== serverPasswordHash) {
-        console.warn('代理请求鉴权失败：密码哈希不匹配');
+        console.warn('代理請求失敗：授權碼不匹配');
         return false;
     }
     
@@ -115,7 +115,7 @@ function validateAuth(event) {
         const now = Date.now();
         const maxAge = 10 * 60 * 1000; // 10分钟
         if (now - parseInt(timestamp) > maxAge) {
-            console.warn('代理请求鉴权失败：时间戳过期');
+            console.warn('代理請求失敗：時間過期');
             return false;
         }
     }
@@ -217,13 +217,13 @@ export const handler = async (event, context) => {
 
     // --- 验证鉴权 ---
     if (!validateAuth(event)) {
-        console.warn('Netlify 代理请求鉴权失败');
+        console.warn('Netlify 代理請求失敗');
         return {
             statusCode: 401,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 success: false,
-                error: '代理访问未授权：请检查密码配置或鉴权参数'
+                error: '代理訪問未授權：請檢查授權碼配置或參數'
             }),
         };
     }
