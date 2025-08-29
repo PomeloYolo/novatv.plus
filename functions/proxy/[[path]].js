@@ -33,7 +33,7 @@ export async function onRequest(context) {
     if (!isValidAuth) {
         return new Response(JSON.stringify({
             success: false,
-            error: '代理访问未授权：请检查密码配置或鉴权参数'
+            error: '代理訪問未授權：請檢查授權碼配置'
         }), { 
             status: 401,
             headers: {
@@ -61,11 +61,11 @@ export async function onRequest(context) {
             if (Array.isArray(parsedAgents) && parsedAgents.length > 0) {
                 USER_AGENTS = parsedAgents;
             } else {
-                 logDebug("环境变量 USER_AGENTS_JSON 格式无效或为空，使用默认值");
+                 logDebug("環境變數 USER_AGENTS_JSON 格式無效或為空，使用預設值");
             }
         }
     } catch (e) {
-        logDebug(`解析环境变量 USER_AGENTS_JSON 失败: ${e.message}，使用默认值`);
+        logDebug(`解析環境變數 USER_AGENTS_JSON 失敗: ${e.message}，使用預設值`);
     }
     // --- 配置读取结束 ---
 
@@ -81,7 +81,7 @@ export async function onRequest(context) {
         // 获取服务器端密码
         const serverPassword = env.PASSWORD;
         if (!serverPassword) {
-            console.error('服务器未设置 PASSWORD 环境变量，代理访问被拒绝');
+            console.error('伺服器未設置 PASSWORD 環境變數，代理訪問被拒絕');
             return false;
         }
         
@@ -95,11 +95,11 @@ export async function onRequest(context) {
             const serverPasswordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             
             if (!authHash || authHash !== serverPasswordHash) {
-                console.warn('代理请求鉴权失败：密码哈希不匹配');
+                console.warn('代理請求失敗：密碼不匹配');
                 return false;
             }
         } catch (error) {
-            console.error('计算密码哈希失败:', error);
+            console.error('計算密碼失敗:', error);
             return false;
         }
         
@@ -108,7 +108,7 @@ export async function onRequest(context) {
             const now = Date.now();
             const maxAge = 10 * 60 * 1000; // 10分钟
             if (now - parseInt(timestamp) > maxAge) {
-                console.warn('代理请求鉴权失败：时间戳过期');
+                console.warn('代理請求失敗：時間過期');
                 return false;
             }
         }
@@ -152,14 +152,14 @@ export async function onRequest(context) {
                      decodedUrl = encodedUrl;
                      logDebug(`Warning: Path was not encoded but looks like URL: ${decodedUrl}`);
                  } else {
-                    logDebug(`无效的目标URL格式 (解码后): ${decodedUrl}`);
+                    logDebug(`無效的目標URL格式 (解碼後): ${decodedUrl}`);
                     return null;
                  }
              }
              return decodedUrl;
 
         } catch (e) {
-            logDebug(`解码目标URL时出错: ${encodedUrl} - ${e.message}`);
+            logDebug(`解碼目標URL時出錯: ${encodedUrl} - ${e.message}`);
             return null;
         }
     }
@@ -259,26 +259,26 @@ export async function onRequest(context) {
 
         try {
             // 直接请求目标 URL
-            logDebug(`开始直接请求: ${targetUrl}`);
+            logDebug(`開始直接請求: ${targetUrl}`);
             // Cloudflare Functions 的 fetch 默认支持重定向
             const response = await fetch(targetUrl, { headers, redirect: 'follow' });
 
             if (!response.ok) {
                  const errorBody = await response.text().catch(() => '');
-                 logDebug(`请求失败: ${response.status} ${response.statusText} - ${targetUrl}`);
+                 logDebug(`請求失敗: ${response.status} ${response.statusText} - ${targetUrl}`);
                  throw new Error(`HTTP error ${response.status}: ${response.statusText}. URL: ${targetUrl}. Body: ${errorBody.substring(0, 150)}`);
             }
 
             // 读取响应内容为文本
             const content = await response.text();
             const contentType = response.headers.get('Content-Type') || '';
-            logDebug(`请求成功: ${targetUrl}, Content-Type: ${contentType}, 内容长度: ${content.length}`);
+            logDebug(`請求成功: ${targetUrl}, Content-Type: ${contentType}, 內容長度: ${content.length}`);
             return { content, contentType, responseHeaders: response.headers }; // 同时返回原始响应头
 
         } catch (error) {
-             logDebug(`请求彻底失败: ${targetUrl}: ${error.message}`);
+             logDebug(`請求徹底失敗: ${targetUrl}: ${error.message}`);
             // 抛出更详细的错误
-            throw new Error(`请求目标URL失败 ${targetUrl}: ${error.message}`);
+            throw new Error(`請求目標URL失敗 ${targetUrl}: ${error.message}`);
         }
     }
 
@@ -314,7 +314,7 @@ export async function onRequest(context) {
     function processKeyLine(line, baseUrl) {
         return line.replace(/URI="([^"]+)"/, (match, uri) => {
             const absoluteUri = resolveUrl(baseUrl, uri);
-            logDebug(`处理 KEY URI: 原始='${uri}', 绝对='${absoluteUri}'`);
+            logDebug(`處理 KEY URI: 原始='${uri}', 絕對='${absoluteUri}'`);
             return `URI="${rewriteUrlToProxy(absoluteUri)}"`; // 重写为代理路径
         });
     }
@@ -323,7 +323,7 @@ export async function onRequest(context) {
     function processMapLine(line, baseUrl) {
          return line.replace(/URI="([^"]+)"/, (match, uri) => {
              const absoluteUri = resolveUrl(baseUrl, uri);
-             logDebug(`处理 MAP URI: 原始='${uri}', 绝对='${absoluteUri}'`);
+             logDebug(`處理 MAP URI: 原始='${uri}', 絕對='${absoluteUri}'`);
              return `URI="${rewriteUrlToProxy(absoluteUri)}"`; // 重写为代理路径
          });
      }
@@ -357,7 +357,7 @@ export async function onRequest(context) {
              }
              if (!line.startsWith('#')) {
                  const absoluteUrl = resolveUrl(baseUrl, line);
-                 logDebug(`重写媒体片段: 原始='${line}', 绝对='${absoluteUrl}'`);
+                 logDebug(`重寫媒體片段: 原始='${line}', 絕對='${absoluteUrl}'`);
                  output.push(rewriteUrlToProxy(absoluteUrl));
                  continue;
              }
@@ -370,17 +370,17 @@ export async function onRequest(context) {
     // 递归处理 M3U8 内容
      async function processM3u8Content(targetUrl, content, recursionDepth = 0, env) {
          if (content.includes('#EXT-X-STREAM-INF') || content.includes('#EXT-X-MEDIA:')) {
-             logDebug(`检测到主播放列表: ${targetUrl}`);
+             logDebug(`偵測到主播放列表: ${targetUrl}`);
              return await processMasterPlaylist(targetUrl, content, recursionDepth, env);
          }
-         logDebug(`检测到媒体播放列表: ${targetUrl}`);
+         logDebug(`偵測到媒體播放列表: ${targetUrl}`);
          return processMediaPlaylist(targetUrl, content);
      }
 
     // 处理主 M3U8 播放列表
     async function processMasterPlaylist(url, content, recursionDepth, env) {
         if (recursionDepth > MAX_RECURSION) {
-            throw new Error(`处理主列表时递归层数过多 (${MAX_RECURSION}): ${url}`);
+            throw new Error(`處理主列表時次數過多 (${MAX_RECURSION}): ${url}`);
         }
 
         const baseUrl = getBaseUrl(url);
@@ -411,19 +411,19 @@ export async function onRequest(context) {
         }
 
          if (!bestVariantUrl) {
-             logDebug(`主列表中未找到 BANDWIDTH 或 STREAM-INF，尝试查找第一个子列表引用: ${url}`);
+             logDebug(`主列表中未找到 BANDWIDTH 或 STREAM-INF，嘗試查找第一個子列表引用: ${url}`);
              for (let i = 0; i < lines.length; i++) {
                  const line = lines[i].trim();
                  if (line && !line.startsWith('#') && (line.endsWith('.m3u8') || line.includes('.m3u8?'))) { // 修复：检查是否包含 .m3u8?
                     bestVariantUrl = resolveUrl(baseUrl, line);
-                     logDebug(`备选方案：找到第一个子列表引用: ${bestVariantUrl}`);
+                     logDebug(`備用方案：找到第一個子列表引用: ${bestVariantUrl}`);
                      break;
                  }
              }
          }
 
         if (!bestVariantUrl) {
-            logDebug(`在主列表 ${url} 中未找到任何有效的子播放列表 URL。可能格式有问题或仅包含音频/字幕。将尝试按媒体列表处理原始内容。`);
+            logDebug(`在主列表 ${url} 中未找到任何有效的子播放列表 URL。可能格式有問題或僅包含音頻/字幕。將嘗試按媒體列表處理原始内容。`);
             return processMediaPlaylist(url, content);
         }
 
@@ -434,9 +434,9 @@ export async function onRequest(context) {
         let kvNamespace = null;
         try {
             kvNamespace = env.LIBRETV_PROXY_KV; // 从环境获取 KV 命名空间 (变量名在 Cloudflare 设置)
-            if (!kvNamespace) throw new Error("KV 命名空间未绑定");
+            if (!kvNamespace) throw new Error("KV 命名空間未綁定");
         } catch (e) {
-            logDebug(`KV 命名空间 'LIBRETV_PROXY_KV' 访问出错或未绑定: ${e.message}`);
+            logDebug(`KV 命名空間 'LIBRETV_PROXY_KV' 訪問出錯或未綁定: ${e.message}`);
             kvNamespace = null; // 确保设为 null
         }
 
@@ -444,22 +444,22 @@ export async function onRequest(context) {
             try {
                 const cachedContent = await kvNamespace.get(cacheKey);
                 if (cachedContent) {
-                    logDebug(`[缓存命中] 主列表的子列表: ${bestVariantUrl}`);
+                    logDebug(`[緩存命中] 主列表的子列表: ${bestVariantUrl}`);
                     return cachedContent;
                 } else {
-                    logDebug(`[缓存未命中] 主列表的子列表: ${bestVariantUrl}`);
+                    logDebug(`[緩存未命中] 主列表的子列表: ${bestVariantUrl}`);
                 }
             } catch (kvError) {
-                logDebug(`从 KV 读取缓存失败 (${cacheKey}): ${kvError.message}`);
+                logDebug(`從 KV 讀取緩存失敗 (${cacheKey}): ${kvError.message}`);
                 // 出错则继续执行，不影响功能
             }
         }
 
-        logDebug(`选择的子列表 (带宽: ${highestBandwidth}): ${bestVariantUrl}`);
+        logDebug(`選擇的子列表 (帶寬: ${highestBandwidth}): ${bestVariantUrl}`);
         const { content: variantContent, contentType: variantContentType } = await fetchContentWithType(bestVariantUrl);
 
         if (!isM3u8Content(variantContent, variantContentType)) {
-            logDebug(`获取到的子列表 ${bestVariantUrl} 不是 M3U8 内容 (类型: ${variantContentType})。可能直接是媒体文件，返回原始内容。`);
+            logDebug(`獲取到的子列表 ${bestVariantUrl} 不是 M3U8 内容 (類型: ${variantContentType})。可能直接是媒體文件，返回原始内容。`);
              // 如果不是M3U8，但看起来像媒体内容，直接返回代理后的内容
              // 注意：这里可能需要决定是否直接代理这个非 M3U8 的 URL
              // 为了简化，我们假设如果不是 M3U8，则流程中断或按原样处理
@@ -477,9 +477,9 @@ export async function onRequest(context) {
                  // 使用 waitUntil 异步写入缓存，不阻塞响应返回
                  // 注意 KV 的写入限制 (免费版每天 1000 次)
                  waitUntil(kvNamespace.put(cacheKey, processedVariant, { expirationTtl: CACHE_TTL }));
-                 logDebug(`已将处理后的子列表写入缓存: ${bestVariantUrl}`);
+                 logDebug(`已將處理後的子列表寫入緩存: ${bestVariantUrl}`);
              } catch (kvError) {
-                 logDebug(`向 KV 写入缓存失败 (${cacheKey}): ${kvError.message}`);
+                 logDebug(`向 KV 寫入緩存失敗 (${cacheKey}): ${kvError.message}`);
                  // 写入失败不影响返回结果
              }
         }
@@ -493,11 +493,11 @@ export async function onRequest(context) {
         const targetUrl = getTargetUrlFromPath(url.pathname);
 
         if (!targetUrl) {
-            logDebug(`无效的代理请求路径: ${url.pathname}`);
-            return createResponse("无效的代理请求。路径应为 /proxy/<经过编码的URL>", 400);
+            logDebug(`無效的代理請求路徑: ${url.pathname}`);
+            return createResponse("無效的代理請求。路徑應為 /proxy/<經過編碼的URL>", 400);
         }
 
-        logDebug(`收到代理请求: ${targetUrl}`);
+        logDebug(`收到代理請求: ${targetUrl}`);
 
         // --- 缓存检查 (KV) ---
         const cacheKey = `proxy_raw:${targetUrl}`; // 使用原始内容的缓存键
@@ -506,7 +506,7 @@ export async function onRequest(context) {
             kvNamespace = env.LIBRETV_PROXY_KV;
             if (!kvNamespace) throw new Error("KV 命名空间未绑定");
         } catch (e) {
-            logDebug(`KV 命名空间 'LIBRETV_PROXY_KV' 访问出错或未绑定: ${e.message}`);
+            logDebug(`KV 命名空見 'LIBRETV_PROXY_KV' 訪問出錯或未綁定: ${e.message}`);
             kvNamespace = null;
         }
 
@@ -514,7 +514,7 @@ export async function onRequest(context) {
             try {
                 const cachedDataJson = await kvNamespace.get(cacheKey); // 直接获取字符串
                 if (cachedDataJson) {
-                    logDebug(`[缓存命中] 原始内容: ${targetUrl}`);
+                    logDebug(`[緩存命中] 原始内容: ${targetUrl}`);
                     const cachedData = JSON.parse(cachedDataJson); // 解析 JSON
                     const content = cachedData.body;
                     let headers = {};
@@ -522,18 +522,18 @@ export async function onRequest(context) {
                     const contentType = headers['content-type'] || headers['Content-Type'] || '';
 
                     if (isM3u8Content(content, contentType)) {
-                        logDebug(`缓存内容是 M3U8，重新处理: ${targetUrl}`);
+                        logDebug(`緩存内容是 M3U8，重新處理: ${targetUrl}`);
                         const processedM3u8 = await processM3u8Content(targetUrl, content, 0, env);
                         return createM3u8Response(processedM3u8);
                     } else {
-                        logDebug(`从缓存返回非 M3U8 内容: ${targetUrl}`);
+                        logDebug(`從緩存返回非 M3U8 内容: ${targetUrl}`);
                         return createResponse(content, 200, new Headers(headers));
                     }
                 } else {
-                     logDebug(`[缓存未命中] 原始内容: ${targetUrl}`);
+                     logDebug(`[緩存未命中] 原始内容: ${targetUrl}`);
                  }
             } catch (kvError) {
-                 logDebug(`从 KV 读取或解析缓存失败 (${cacheKey}): ${kvError.message}`);
+                 logDebug(`從 KV 讀取或解析緩存失敗 (${cacheKey}): ${kvError.message}`);
                  // 出错则继续执行，不影响功能
             }
         }
@@ -549,20 +549,20 @@ export async function onRequest(context) {
                  const cacheValue = { body: content, headers: JSON.stringify(headersToCache) };
                  // 注意 KV 写入限制
                  waitUntil(kvNamespace.put(cacheKey, JSON.stringify(cacheValue), { expirationTtl: CACHE_TTL }));
-                 logDebug(`已将原始内容写入缓存: ${targetUrl}`);
+                 logDebug(`已將原始内容寫入緩存: ${targetUrl}`);
             } catch (kvError) {
-                 logDebug(`向 KV 写入缓存失败 (${cacheKey}): ${kvError.message}`);
+                 logDebug(`向 KV 寫入緩存失敗 (${cacheKey}): ${kvError.message}`);
                  // 写入失败不影响返回结果
             }
         }
 
         // --- 处理响应 ---
         if (isM3u8Content(content, contentType)) {
-            logDebug(`内容是 M3U8，开始处理: ${targetUrl}`);
+            logDebug(`内容是 M3U8，開始處理: ${targetUrl}`);
             const processedM3u8 = await processM3u8Content(targetUrl, content, 0, env);
             return createM3u8Response(processedM3u8);
         } else {
-            logDebug(`内容不是 M3U8 (类型: ${contentType})，直接返回: ${targetUrl}`);
+            logDebug(`內容不是 M3U8 (類型: ${contentType})，直接返回: ${targetUrl}`);
             const finalHeaders = new Headers(responseHeaders);
             finalHeaders.set('Cache-Control', `public, max-age=${CACHE_TTL}`);
             // 添加 CORS 头，确保非 M3U8 内容也能跨域访问（例如图片、字幕文件等）
@@ -573,8 +573,8 @@ export async function onRequest(context) {
         }
 
     } catch (error) {
-        logDebug(`处理代理请求时发生严重错误: ${error.message} \n ${error.stack}`);
-        return createResponse(`代理处理错误: ${error.message}`, 500);
+        logDebug(`處理代理请求時發生嚴重錯誤: ${error.message} \n ${error.stack}`);
+        return createResponse(`代理處理錯誤: ${error.message}`, 500);
     }
 }
 
