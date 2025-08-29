@@ -37,7 +37,7 @@ async function checkForUpdates() {
         // 获取最新版本
         let latestVersion;
         const VERSION_URL = {
-            PROXY: 'https://github.com/PomeloYolo/NovaTV/blob/main/VERSION.txt',
+            PROXY: 'https://raw.githubusercontent.com/PomeloYolo/NovaTV/refs/heads/main/VERSION.txt',
             DIRECT: 'https://github.com/PomeloYolo/NovaTV/blob/main/VERSION.txt'
         };
         const FETCH_TIMEOUT = 1500;
