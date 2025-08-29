@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.location.href
                     );
                 } catch (e) {
-                    console.error('更新浏览器历史失败:', e);
+                    console.error('更新瀏覽器歷史失敗:', e);
                 }
             }, 300);
         }
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     `/s=${encodeURIComponent(searchQuery)}`
                 );
             } catch (e) {
-                console.error('更新浏览器历史失败:', e);
+                console.error('更新瀏覽器歷史失敗:', e);
             }
         }, 300);
     }
