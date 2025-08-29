@@ -1,5 +1,8 @@
 async function searchByAPIAndKeyWord(apiId, query) {
     try {
+        // 🔹 自動把繁體轉簡體
+        query = ChineseConv.toSimplified(query);
+        
         let apiUrl, apiName, apiBaseUrl;
         
         // 处理自定义API
