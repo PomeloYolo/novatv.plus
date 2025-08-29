@@ -41,7 +41,7 @@ async function getPasswordHash() {
             cachedPasswordHash = hash;
             return hash;
         } catch (error) {
-            console.error('生成密码哈希失败:', error);
+            console.error('生成授權碼哈希失敗:', error);
         }
     }
     
@@ -61,7 +61,7 @@ async function addAuthToProxyUrl(url) {
     try {
         const hash = await getPasswordHash();
         if (!hash) {
-            console.warn('无法获取密码哈希，代理请求可能失败');
+            console.warn('無法獲取授權碼哈希，代理請求可能失敗');
             return url;
         }
         
@@ -73,7 +73,7 @@ async function addAuthToProxyUrl(url) {
         
         return `${url}${separator}auth=${encodeURIComponent(hash)}&t=${timestamp}`;
     } catch (error) {
-        console.error('添加代理鉴权失败:', error);
+        console.error('添加代理失敗:', error);
         return url;
     }
 }
@@ -96,7 +96,7 @@ function validateProxyAuth(authHash, serverPasswordHash, timestamp) {
     const maxAge = 10 * 60 * 1000; // 10分钟
     
     if (timestamp && (now - parseInt(timestamp)) > maxAge) {
-        console.warn('代理请求时间戳过期');
+        console.warn('代理請求時間過期');
         return false;
     }
     
