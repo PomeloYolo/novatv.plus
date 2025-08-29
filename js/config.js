@@ -14,7 +14,7 @@ const PASSWORD_CONFIG = {
 
 // 网站信息配置
 const SITE_CONFIG = {
-    name: 'LibreTV',
+    name: 'NovaTV',
     url: 'https://libretv.is-an.org',
     description: '免費線上影視觀看平台',
     logo: 'image/logo.png',
