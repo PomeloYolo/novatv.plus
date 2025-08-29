@@ -60,7 +60,7 @@ async function verifyPassword(password) {
         }
         return isValid;
     } catch (error) {
-        console.error('验证密码时出错:', error);
+        console.error('驗證授權碼時出錯:', error);
         return false;
     }
 }
@@ -79,7 +79,7 @@ function isPasswordVerified() {
         return timestamp && passwordHash === currentHash &&
             Date.now() - timestamp < PASSWORD_CONFIG.verificationTTL;
     } catch (error) {
-        console.error('检查密码验证状态时出错:', error);
+        console.error('檢查授權碼驗證狀態時出錯:', error);
         return false;
     }
 }
@@ -121,15 +121,15 @@ function showPasswordModal() {
             // 修改弹窗内容提示用户需要先设置密码
             const title = passwordModal.querySelector('h2');
             const description = passwordModal.querySelector('p');
-            if (title) title.textContent = '需要设置密码';
-            if (description) description.textContent = '请先在部署平台设置 PASSWORD 环境变量来保护您的实例';
+            if (title) title.textContent = '需要設置授權碼';
+            if (description) description.textContent = '請先在部屬平台設置 PASSWORD 環境變數来保障您的權益';
             
             // 隐藏密码输入框和提交按钮，只显示提示信息
             const form = passwordModal.querySelector('form');
             const errorMsg = document.getElementById('passwordError');
             if (form) form.style.display = 'none';
             if (errorMsg) {
-                errorMsg.textContent = '为确保安全，必须设置 PASSWORD 环境变量才能使用本服务，请联系管理员进行配置';
+                errorMsg.textContent = '為確保安全，必須設置 PASSWORD 環境變數才能使用本服務，請聯繫管理員進行配置';
                 errorMsg.classList.remove('hidden');
                 errorMsg.className = 'text-red-500 mt-2 font-medium'; // 改为更醒目的红色
             }
@@ -137,8 +137,8 @@ function showPasswordModal() {
             // 正常的密码验证模式
             const title = passwordModal.querySelector('h2');
             const description = passwordModal.querySelector('p');
-            if (title) title.textContent = '访问验证';
-            if (description) description.textContent = '请输入密码继续访问';
+            if (title) title.textContent = '訪問驗證';
+            if (description) description.textContent = '請輸入授權碼以繼續訪問';
             
             const form = passwordModal.querySelector('form');
             if (form) form.style.display = 'block';
