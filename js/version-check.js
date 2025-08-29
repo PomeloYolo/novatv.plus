@@ -56,10 +56,10 @@ async function checkForUpdates() {
             try {
                 // 代理失败后尝试直接获取
                 latestVersion = await fetchVersion(VERSION_URL.DIRECT, '獲取最新版本失败');
-                console.log('直接请求获取版本成功');
+                console.log('直接請求獲取版本成功');
             } catch (directError) {
-                console.error('所有版本检查请求均失败:', directError);
-                throw new Error('无法获取最新版本信息');
+                console.error('所有版本检查請求均失敗:', directError);
+                throw new Error('無法獲取最新版本訊息');
             }
         }
         
@@ -112,7 +112,7 @@ function formatVersion(versionString) {
 function createErrorVersionElement(errorMessage) {
     const errorElement = document.createElement('p');
     errorElement.className = 'text-gray-500 text-sm mt-1 text-center md:text-left';
-    errorElement.innerHTML = `版本: <span class="text-amber-500">检测失败</span>`;
+    errorElement.innerHTML = `版本: <span class="text-amber-500">檢測失败</span>`;
     errorElement.title = errorMessage;
     return errorElement;
 }
