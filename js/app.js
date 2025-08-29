@@ -584,11 +584,11 @@ function resetSearchArea() {
     try {
         window.history.pushState(
             {},
-            `LibreTV - 免費線上影視搜索與觀看平台`,
+            `NovaTV - 免費線上影視搜索與觀看平台`,
             `/`
         );
         // 更新页面标题
-        document.title = `LibreTV - 免費線上影視搜索與觀看平台`;
+        document.title = `NovaTV - 免費線上影視搜索與觀看平台`;
     } catch (e) {
         console.error('更新瀏覽器歷史失敗:', e);
     }
@@ -708,11 +708,11 @@ async function search() {
             // 使用HTML5 History API更新URL，不刷新页面
             window.history.pushState(
                 { search: query },
-                `搜索: ${query} - LibreTV`,
+                `搜索: ${query} - NovaTV`,
                 `/s=${encodedQuery}`
             );
             // 更新页面标题
-            document.title = `搜索: ${query} - LibreTV`;
+            document.title = `搜索: ${query} - NovaTV`;
         } catch (e) {
             console.error('更新瀏覽器歷史失敗:', e);
             // 如果更新URL失败，继续执行搜索
@@ -1217,7 +1217,7 @@ async function importConfigFromUrl() {
             }
 
             const config = await response.json();
-            if (config.name !== 'LibreTV-Settings') throw '配置文件格式不正確';
+            if (config.name !== 'NovaTV-Settings') throw '配置文件格式不正確';
 
             // 验证哈希
             const dataHash = await sha256(JSON.stringify(config.data));
@@ -1269,7 +1269,7 @@ async function importConfig() {
 
             // 解析并验证配置
             const config = JSON.parse(content);
-            if (config.name !== 'LibreTV-Settings') throw '配置文件格式不正確';
+            if (config.name !== 'NovaTV-Settings') throw '配置文件格式不正確';
 
             // 验证哈希
             const dataHash = await sha256(JSON.stringify(config.data));
@@ -1326,14 +1326,14 @@ async function exportConfig() {
     }
 
     const times = Date.now().toString();
-    config['name'] = 'LibreTV-Settings';  // 配置文件名，用于校验
+    config['name'] = 'NovaTV-Settings';  // 配置文件名，用于校验
     config['time'] = times;               // 配置文件生成时间
     config['cfgVer'] = '1.0.0';           // 配置文件版本
     config['data'] = items;               // 配置文件数据
     config['hash'] = await sha256(JSON.stringify(config['data']));  // 计算数据的哈希值，用于校验
 
     // 将配置数据保存为 JSON 文件
-    saveStringAsFile(JSON.stringify(config), 'LibreTV-Settings_' + times + '.json');
+    saveStringAsFile(JSON.stringify(config), 'NovaTV-Settings_' + times + '.json');
 }
 
 // 将字符串保存为文件
