@@ -197,7 +197,7 @@ async function handleApiRequest(url) {
             }
         }
 
-        throw new Error('未知的API路径');
+        throw new Error('未知的API路徑');
     } catch (error) {
         console.error('API處理錯誤:', error);
         return JSON.stringify({
@@ -459,10 +459,10 @@ async function handleAggregatedSearch(searchQuery) {
             list: uniqueResults,
         });
     } catch (error) {
-        console.error('聚合搜索处理错误:', error);
+        console.error('聚合搜索處理錯誤:', error);
         return JSON.stringify({
             code: 400,
-            msg: '聚合搜索处理失败: ' + error.message,
+            msg: '聚合搜索處理失敗: ' + error.message,
             list: []
         });
     }
@@ -477,7 +477,7 @@ async function handleMultipleCustomSearch(searchQuery, customApiUrls) {
         .slice(0, CUSTOM_API_CONFIG.maxSources);
     
     if (apiUrls.length === 0) {
-        throw new Error('没有提供有效的自定义API地址');
+        throw new Error('沒有提供有效的的自定義API地址');
     }
     
     // 为每个API创建搜索请求
@@ -487,7 +487,7 @@ async function handleMultipleCustomSearch(searchQuery, customApiUrls) {
             
             // 使用Promise.race添加超时处理
             const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error(`自定义API ${index+1} 搜索超时`)), 8000)
+                setTimeout(() => reject(new Error(`自定義API ${index+1} 搜索超時`)), 8000)
             );
             
             // 添加鉴权参数到代理URL
@@ -502,13 +502,13 @@ async function handleMultipleCustomSearch(searchQuery, customApiUrls) {
             const response = await Promise.race([fetchPromise, timeoutPromise]);
             
             if (!response.ok) {
-                throw new Error(`自定义API ${index+1} 请求失败: ${response.status}`);
+                throw new Error(`自定義API ${index+1} 請求失败: ${response.status}`);
             }
             
             const data = await response.json();
             
             if (!data || !Array.isArray(data.list)) {
-                throw new Error(`自定义API ${index+1} 返回的数据格式无效`);
+                throw new Error(`自定義API ${index+1} 返回的數據格式無效`);
             }
             
             // 为搜索结果添加源信息
@@ -521,7 +521,7 @@ async function handleMultipleCustomSearch(searchQuery, customApiUrls) {
             
             return results;
         } catch (error) {
-            console.warn(`自定义API ${index+1} 搜索失败:`, error);
+            console.warn(`自定義API ${index+1} 搜索失敗:`, error);
             return []; // 返回空数组表示该源搜索失败
         }
     });
@@ -543,7 +543,7 @@ async function handleMultipleCustomSearch(searchQuery, customApiUrls) {
             return JSON.stringify({
                 code: 200,
                 list: [],
-                msg: '所有自定义API源均无搜索结果'
+                msg: '所有自定義API源均無搜索结果'
             });
         }
         
@@ -564,10 +564,10 @@ async function handleMultipleCustomSearch(searchQuery, customApiUrls) {
             list: uniqueResults,
         });
     } catch (error) {
-        console.error('自定义API聚合搜索处理错误:', error);
+        console.error('自定義API聚合搜索處理錯誤:', error);
         return JSON.stringify({
             code: 400,
-            msg: '自定义API聚合搜索处理失败: ' + error.message,
+            msg: '自定義API聚合搜索處理失敗: ' + error.message,
             list: []
         });
     }
@@ -597,7 +597,7 @@ async function handleMultipleCustomSearch(searchQuery, customApiUrls) {
             } catch (error) {
                 return new Response(JSON.stringify({
                     code: 500,
-                    msg: '服务器内部错误',
+                    msg: '伺服器内部錯誤',
                 }), {
                     status: 500,
                     headers: {
@@ -630,7 +630,7 @@ async function testSiteAvailability(apiUrl) {
         // 检查API响应的有效性
         return data && data.code !== 400 && Array.isArray(data.list);
     } catch (error) {
-        console.error('站点可用性测试失败:', error);
+        console.error('節點可用性測試失敗:', error);
         return false;
     }
 }
