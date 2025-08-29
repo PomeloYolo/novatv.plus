@@ -1,8 +1,8 @@
 // 豆瓣热门电影电视剧推荐功能
 
 // 豆瓣标签列表 - 修改为默认标签
-let defaultMovieTags = ['熱門', '最新', '經典', '高分', '冷門佳片', '華語', '歐美', '韓國', '日本', '動作', '喜劇', '日綜', '愛情', '科幻', '懸疑', '恐怖', '治癒'];
-let defaultTvTags = ['熱門', '美劇', '英劇', '韓劇', '日劇', '陸劇', '港劇', '日本動漫', '綜藝', '紀錄片'];
+let defaultMovieTags = ['热门', '最新', '經典', '高分', '冷門佳片', '華語', '歐美', '韓國', '日本', '動作', '喜劇', '日綜', '愛情', '科幻', '懸疑', '恐怖', '治癒'];
+let defaultTvTags = ['热门', '美劇', '英劇', '韓劇', '日劇', '陸劇', '港劇', '日本動漫', '綜藝', '紀錄片'];
 
 // 用户标签列表 - 存储用户实际使用的标签（包含保留的系统标签和用户添加的自定义标签）
 let movieTags = [];
@@ -44,12 +44,12 @@ function saveUserTags() {
         localStorage.setItem('userTvTags', JSON.stringify(tvTags));
     } catch (e) {
         console.error('保存標籤失敗：', e);
-        showToast('保存标签失败', 'error');
+        showToast('保存標籤失敗', 'error');
     }
 }
 
 let doubanMovieTvCurrentSwitch = 'movie';
-let doubanCurrentTag = '熱門';
+let doubanCurrentTag = '热门';
 let doubanPageStart = 0;
 const doubanPageSize = 16; // 一次显示的项目数量
 
@@ -299,7 +299,7 @@ function renderDoubanMovieTvSwitch() {
             movieToggle.classList.add('text-gray-300');
             
             doubanMovieTvCurrentSwitch = 'tv';
-            doubanCurrentTag = '熱門';
+            doubanCurrentTag = '热门';
 
             // 重新加载豆瓣内容
             renderDoubanTags(tvTags);
@@ -733,7 +733,7 @@ function addTag(tag) {
 // 删除标签
 function deleteTag(tag) {
     // 热门标签不能删除
-    if (tag === '熱門') {
+    if (tag === '热门') {
         showToast('熱門標籤不能刪除', 'warning');
         return;
     }
@@ -754,7 +754,7 @@ function deleteTag(tag) {
         
         // 如果当前选中的是被删除的标签，则重置为"热门"
         if (doubanCurrentTag === tag) {
-            doubanCurrentTag = '熱門';
+            doubanCurrentTag = '热门';
             doubanPageStart = 0;
             renderRecommend(doubanCurrentTag, doubanPageSize, doubanPageStart);
         }
@@ -779,7 +779,7 @@ function resetTagsToDefault() {
     }
     
     // 设置当前标签为热门
-    doubanCurrentTag = '熱門';
+    doubanCurrentTag = '热门';
     doubanPageStart = 0;
     
     // 保存到本地存储
