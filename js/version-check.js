@@ -38,7 +38,7 @@ async function checkForUpdates() {
         let latestVersion;
         const VERSION_URL = {
             PROXY: 'https://ghfast.top/raw.githubusercontent.com/LibreSpark/NovaTV/main/VERSION.txt',
-            DIRECT: 'https://raw.githubusercontent.com/LibreSpark/NovaTV/main/VERSION.txt'
+            DIRECT: 'https://github.com/PomeloYolo/NovaTV/blob/main/VERSION.txt'
         };
         const FETCH_TIMEOUT = 1500;
         
@@ -55,7 +55,7 @@ async function checkForUpdates() {
             console.log('代理请求失败，尝试直接请求:', error.message);
             try {
                 // 代理失败后尝试直接获取
-                latestVersion = await fetchVersion(VERSION_URL.DIRECT, '獲取最新版本失败');
+                latestVersion = await fetchVersion(VERSION_URL.DIRECT, '獲取最新版本失敗');
                 console.log('直接請求獲取版本成功');
             } catch (directError) {
                 console.error('所有版本检查請求均失敗:', directError);
@@ -112,7 +112,7 @@ function formatVersion(versionString) {
 function createErrorVersionElement(errorMessage) {
     const errorElement = document.createElement('p');
     errorElement.className = 'text-gray-500 text-sm mt-1 text-center md:text-left';
-    errorElement.innerHTML = `版本: <span class="text-amber-500">檢測失败</span>`;
+    errorElement.innerHTML = `版本: <span class="text-amber-500">檢測失敗</span>`;
     errorElement.title = errorMessage;
     return errorElement;
 }
