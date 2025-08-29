@@ -1,7 +1,7 @@
 FROM node:lts-alpine
 
 LABEL maintainer="Pomelo Team"
-LABEL description="LibreTV - 免費線上觀影集搜索平台"
+LABEL description="NovaTV - 免費線上觀影集搜索平台"
 
 # 设置环境变量
 ENV PORT=8080
