@@ -1,10 +1,6 @@
-// 建立繁體 → 簡體的轉換器
-const t2sConverter = OpenCC.Converter({ from: 't', to: 's' });
 
 async function searchByAPIAndKeyWord(apiId, query) {
     try {
-        // 🔹 自動把繁體轉簡體
-        query = t2sConverter(query);
         
         let apiUrl, apiName, apiBaseUrl;
         
