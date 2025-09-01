@@ -52,7 +52,7 @@ async function checkForUpdates() {
             latestVersion = await Promise.race([proxyPromise, timeoutPromise]);
             console.log('通過代理伺服器更新版本成功');
         } catch (error) {
-            console.log('代理请求失败，尝试直接请求:', error.message);
+            console.log('代理請求失敗，嘗試直接請求:', error.message);
             try {
                 // 代理失败后尝试直接获取
                 latestVersion = await fetchVersion(VERSION_URL.DIRECT, '獲取最新版本失敗');
