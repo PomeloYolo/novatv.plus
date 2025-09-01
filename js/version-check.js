@@ -133,7 +133,7 @@ function addVersionInfoToFooter() {
         versionElement.className = 'text-gray-500 text-sm mt-1 text-center md:text-left';
         
         // 添加当前版本信息
-        versionElement.innerHTML = `版本: ${result.currentFormatted} <a href="https://github.com/PomeloYolo/NovaTV/releases" target="_blank" class="text-blue-500 underline ml-1">更新說明</a>`;
+        versionElement.innerHTML = `版本: ${result.currentFormatted} :
         
         // 如果有更新，添加更新提示
         if (result.hasUpdate) {
