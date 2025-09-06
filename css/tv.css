@@ -1,12 +1,29 @@
-/* tv.css: 電視版樣式，讓 focus 更明顯 */
+/* tv.css: 電視版樣式 */
+
+/* 全局焦點樣式 */
 :focus {
   outline: 3px solid #ff4081;
   outline-offset: 4px;
   border-radius: 8px;
+  background-color: rgba(255, 64, 129, 0.2);
+  transition: all 0.2s ease;
 }
 
+/* 按鈕在電視上更大 */
 button {
   min-height: 48px;
-  min-width: 80px;
+  min-width: 100px;
   font-size: 1.1rem;
+}
+
+/* 搜尋結果 / 熱門推薦卡片可聚焦 */
+#results .card,
+#douban-results .card {
+  cursor: pointer;
+}
+
+#results .card:focus,
+#douban-results .card:focus {
+  outline: 3px solid #ff9800;
+  transform: scale(1.05);
 }
