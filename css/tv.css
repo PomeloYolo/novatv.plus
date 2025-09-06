@@ -1,0 +1,12 @@
+/* tv.css: 電視版樣式，讓 focus 更明顯 */
+:focus {
+  outline: 3px solid #ff4081;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+button {
+  min-height: 48px;
+  min-width: 80px;
+  font-size: 1.1rem;
+}
