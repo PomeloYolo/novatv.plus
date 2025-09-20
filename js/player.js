@@ -91,12 +91,160 @@ let shortcutHintTimeout = null; // 用于控制快捷键提示显示时间
 let adFilteringEnabled = true; // 默认开启广告过滤
 let progressSaveInterval = null; // 定期保存进度的计时器
 let currentVideoUrl = ''; // 记录当前实际的视频URL
+let videoId = ''; // 当前视频ID
+let videoTitle = ''; // 当前视频标题
+let videoThumbnail = ''; // 当前视频缩略图
 const isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function')
 Artplayer.FULLSCREEN_WEB_IN_BODY = true;
 
 
+// 收藏功能相關代碼
+// 獲取收藏列表
+function getFavorites() {
+    const favorites = localStorage.getItem('favorites');
+    return favorites ? JSON.parse(favorites) : [];
+}
+
+// 檢查是否已收藏
+function isInFavorites(id) {
+    if (!id) return false;
+    const favorites = getFavorites();
+    return favorites.some(item => item.id === id);
+}
+
+// 添加到收藏
+function addToFavorites() {
+    if (!videoId) return false;
+    
+    const favorites = getFavorites();
+    
+    // 檢查是否已經收藏
+    if (isInFavorites(videoId)) {
+        return false;
+    }
+    
+    // 添加到收藏列表
+    favorites.unshift({
+        id: videoId,
+        title: videoTitle || '未知標題',
+        thumbnail: videoThumbnail || '',
+        addedAt: new Date().toISOString()
+    });
+    
+    // 限制收藏數量為100
+    if (favorites.length > 100) {
+        favorites.pop();
+    }
+    
+    // 保存到本地存儲
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    showToast('已添加到收藏', 'success');
+    updateFavoriteButtonStatus();
+    return true;
+}
+
+// 從收藏中移除
+function removeFromFavorites() {
+    if (!videoId) return false;
+    
+    const favorites = getFavorites();
+    const initialLength = favorites.length;
+    
+    // 過濾掉要移除的項
+    const newFavorites = favorites.filter(item => item.id !== videoId);
+    
+    // 如果長度沒變，說明沒有找到要移除的項
+    if (newFavorites.length === initialLength) {
+        return false;
+    }
+    
+    // 保存到本地存儲
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+    showToast('已從收藏中移除', 'success');
+    updateFavoriteButtonStatus();
+    return true;
+}
+
+// 更新收藏按鈕狀態
+function updateFavoriteButtonStatus() {
+    const favoriteButton = document.getElementById('favoriteButton');
+    const favoriteIcon = document.getElementById('favoriteIcon');
+    const favoriteText = document.getElementById('favoriteText');
+    
+    if (!favoriteButton || !favoriteIcon || !favoriteText) return;
+    
+    if (isInFavorites(videoId)) {
+        favoriteIcon.setAttribute('fill', 'currentColor');
+        favoriteText.textContent = '取消收藏';
+        favoriteButton.classList.add('text-pink-500');
+        favoriteButton.classList.remove('text-white');
+    } else {
+        favoriteIcon.setAttribute('fill', 'none');
+        favoriteText.textContent = '收藏影片';
+        favoriteButton.classList.remove('text-pink-500');
+        favoriteButton.classList.add('text-white');
+    }
+}
+
+// 切換收藏狀態
+function toggleFavoriteStatus() {
+    if (isInFavorites(videoId)) {
+        removeFromFavorites();
+    } else {
+        addToFavorites();
+    }
+}
+
+// 顯示提示信息
+function showToast(message, type = 'info') {
+    // 檢查是否已存在toast元素，如果有則移除
+    const existingToast = document.getElementById('toast-notification');
+    if (existingToast) {
+        document.body.removeChild(existingToast);
+    }
+    
+    // 創建新的toast元素
+    const toast = document.createElement('div');
+    toast.id = 'toast-notification';
+    toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-white z-50 transition-opacity duration-300`;
+    
+    // 根據類型設置背景顏色
+    if (type === 'success') {
+        toast.classList.add('bg-green-600');
+    } else if (type === 'error') {
+        toast.classList.add('bg-red-600');
+    } else {
+        toast.classList.add('bg-blue-600');
+    }
+    
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // 3秒後自動消失
+    setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                document.body.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+}
+
 // 初始化播放器
 initPlayer(currentVideoUrl);
+
+// 初始化頁面
+document.addEventListener('DOMContentLoaded', function() {
+    // 獲取URL參數
+    const urlParams = new URLSearchParams(window.location.search);
+    videoId = urlParams.get('id');
+    videoTitle = urlParams.get('title') || '未知標題';
+    videoThumbnail = urlParams.get('thumbnail') || '';
+    
+    // 更新收藏按鈕狀態
+    updateFavoriteButtonStatus();
+});
 
 // 页面加载
 document.addEventListener('DOMContentLoaded', function () {
@@ -1798,7 +1946,7 @@ async function switchToResource(sourceKey, vodId) {
             localStorage.setItem('currentSourceCode', sourceKey);
             localStorage.setItem('lastPlayTime', Date.now());
         } catch (e) {
-            console.error('保存播放状态失败:', e);
+            console.error('保存播放狀態失敗:', e);
         }
 
         // 跳转到播放页面
