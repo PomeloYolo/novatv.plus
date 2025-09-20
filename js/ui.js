@@ -789,6 +789,71 @@ function getFavorites() {
     }
 }
 
+// 在詳情頁切換收藏狀態
+function toggleFavoriteInDetail() {
+    // 獲取當前影片信息
+    const videoId = window.currentVideoId;
+    const videoTitle = currentVideoTitle;
+    const sourceCode = window.currentSourceCode;
+    
+    if (!videoId || !videoTitle) {
+        showToast('無法獲取影片信息', 'error');
+        return;
+    }
+    
+    // 檢查是否已收藏
+    const favorites = getFavorites();
+    const isAlreadyFavorited = favorites.some(item => item.id === videoId);
+    
+    // 切換收藏狀態
+    if (isAlreadyFavorited) {
+        // 移除收藏
+        const newFavorites = favorites.filter(item => item.id !== videoId);
+        localStorage.setItem('favorites', JSON.stringify(newFavorites));
+        // 更新按鈕樣式
+        updateFavoriteButtonInDetail(false);
+        showToast('已取消收藏', 'success');
+    } else {
+        // 添加收藏
+        const newFavorite = {
+            id: videoId,
+            title: videoTitle,
+            sourceCode: sourceCode,
+            favoriteTime: Date.now()
+        };
+        favorites.unshift(newFavorite);
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        // 更新按鈕樣式
+        updateFavoriteButtonInDetail(true);
+        showToast('已加入收藏', 'success');
+    }
+}
+
+// 更新詳情頁收藏按鈕狀態
+function updateFavoriteButtonInDetail() {
+    const favoriteBtn = document.getElementById('favoriteBtn');
+    const favoriteBtnIcon = document.getElementById('favoriteBtnIcon');
+    
+    if (!favoriteBtn || !favoriteBtnIcon) return;
+    
+    // 檢查是否已收藏
+    const videoId = window.currentVideoId;
+    if (!videoId) return;
+    
+    const favorites = getFavorites();
+    const isAlreadyFavorited = favorites.some(item => item.id === videoId);
+    
+    if (isAlreadyFavorited) {
+        favoriteBtnIcon.setAttribute('fill', 'currentColor');
+        favoriteBtn.classList.add('text-pink-500');
+        favoriteBtn.classList.remove('text-white');
+    } else {
+        favoriteBtnIcon.setAttribute('fill', 'none');
+        favoriteBtn.classList.remove('text-pink-500');
+        favoriteBtn.classList.add('text-white');
+    }
+}
+
 // 添加到收藏
 function addToFavorites(videoInfo) {
     // 密码保护校验
