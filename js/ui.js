@@ -777,7 +777,395 @@ function clearViewingHistory() {
     }
 }
 
-// 更新toggleSettings函数以处理历史面板互动
+// 收藏功能相關函數
+// 獲取收藏列表
+function getFavorites() {
+    try {
+        const data = localStorage.getItem('favorites');
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        console.error('獲取收藏列表失敗:', e);
+        return [];
+    }
+}
+
+// 添加到收藏
+function addToFavorites(videoInfo) {
+    // 密码保护校验
+    if (window.isPasswordProtected && window.isPasswordVerified) {
+        if (window.isPasswordProtected() && !window.isPasswordVerified()) {
+            showPasswordModal && showPasswordModal();
+            return;
+        }
+    }
+    
+    try {
+        const favorites = getFavorites();
+        
+        // 確保videoInfo有showIdentifier
+        if (!videoInfo.showIdentifier) {
+            if (videoInfo.sourceName && videoInfo.vod_id) {
+                videoInfo.showIdentifier = `${videoInfo.sourceName}_${videoInfo.vod_id}`;
+            } else {
+                videoInfo.showIdentifier = (videoInfo.episodes && videoInfo.episodes.length > 0) ? videoInfo.episodes[0] : videoInfo.url;
+            }
+        }
+        
+        // 檢查是否已經收藏
+        const existingIndex = favorites.findIndex(item => 
+            item.title === videoInfo.title && 
+            item.showIdentifier === videoInfo.showIdentifier
+        );
+        
+        if (existingIndex !== -1) {
+            // 已經收藏過，顯示提示
+            showToast('此影片已在收藏列表中', 'info');
+            return false;
+        } else {
+            // 添加到收藏
+            const favoriteItem = {
+                ...videoInfo,
+                favoriteTime: Date.now()
+            };
+            
+            favorites.unshift(favoriteItem);
+            
+            // 保存到本地存儲
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            showToast('已添加到收藏', 'success');
+            return true;
+        }
+    } catch (e) {
+        console.error('添加收藏失敗:', e);
+        showToast('添加收藏失敗', 'error');
+        return false;
+    }
+}
+
+// 從收藏中移除
+function removeFromFavorites(showIdentifier, title) {
+    try {
+        const favorites = getFavorites();
+        
+        // 查找要刪除的項目
+        const existingIndex = favorites.findIndex(item => 
+            item.showIdentifier === showIdentifier && 
+            (title ? item.title === title : true)
+        );
+        
+        if (existingIndex !== -1) {
+            // 從收藏中移除
+            favorites.splice(existingIndex, 1);
+            
+            // 保存到本地存儲
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            
+            // 重新加載收藏列表
+            loadFavorites();
+            
+            showToast('已從收藏中移除', 'success');
+            return true;
+        } else {
+            showToast('未找到該收藏項', 'warning');
+            return false;
+        }
+    } catch (e) {
+        console.error('移除收藏失敗:', e);
+        showToast('移除收藏失敗', 'error');
+        return false;
+    }
+}
+
+// 檢查是否已收藏
+function isFavorited(showIdentifier, title) {
+    try {
+        const favorites = getFavorites();
+        return favorites.some(item => 
+            item.showIdentifier === showIdentifier && 
+            (title ? item.title === title : true)
+        );
+    } catch (e) {
+        console.error('檢查收藏狀態失敗:', e);
+        return false;
+    }
+}
+
+// 加載收藏列表並渲染
+function loadFavorites() {
+    const favoritesList = document.getElementById('favoritesList');
+    if (!favoritesList) return;
+    
+    const favorites = getFavorites();
+    
+    if (favorites.length === 0) {
+        favoritesList.innerHTML = `<div class="text-center text-gray-500 py-8">暫無收藏影片</div>`;
+        return;
+    }
+    
+    // 渲染收藏列表
+    favoritesList.innerHTML = favorites.map(item => {
+        // 防止XSS
+        const safeTitle = item.title
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+            
+        const safeSource = item.sourceName ?
+            item.sourceName.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') :
+            '未知来源';
+            
+        const episodeText = item.episodeIndex !== undefined ?
+            `第${item.episodeIndex + 1}集` : '';
+            
+        // 格式化收藏時間
+        const favoriteTime = item.favoriteTime ? formatTimestamp(item.favoriteTime) : '';
+        
+        // 編碼URL用於安全傳遞
+        const encodedUrl = encodeURIComponent(item.url || '');
+        const encodedShowIdentifier = encodeURIComponent(item.showIdentifier || '');
+        
+        return `
+            <div class="history-item flex p-3 border-b border-gray-700 hover:bg-gray-800 transition-colors relative">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-white font-medium truncate pr-2">${safeTitle}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="removeFromFavorites('${encodedShowIdentifier}', '${safeTitle}')" class="text-gray-400 hover:text-red-500 transition-colors" aria-label="從收藏中移除">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-400 mt-1">
+                        <span class="truncate">${safeSource}</span>
+                        ${episodeText ? `<span class="mx-2">|</span><span>${episodeText}</span>` : ''}
+                    </div>
+                    <div class="mt-2 flex justify-between items-center">
+                        <button onclick="playFromHistory('${encodedUrl}', '${safeTitle}', ${item.episodeIndex || 0}, ${item.playbackPosition || 0})" class="px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded text-xs transition-all duration-300 shadow hover:shadow-lg">
+                            播放
+                        </button>
+                        <div class="text-xs text-gray-500">${favoriteTime}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // 檢查是否存在較多收藏，添加底部邊距確保底部按鈕不會擋住內容
+    if (favorites.length > 5) {
+        favoritesList.classList.add('pb-4');
+    }
+}
+
+// 清空收藏列表
+function clearFavorites() {
+    try {
+        localStorage.removeItem('favorites');
+        loadFavorites(); // 重新加載空的收藏列表
+        showToast('收藏列表已清空', 'success');
+    } catch (e) {
+        console.error('清除收藏列表失敗:', e);
+        showToast('清除收藏列表失敗', 'error');
+    }
+}
+
+// 切換收藏面板顯示
+function toggleFavorites(e) {
+    if (e) e.stopPropagation();
+    
+    const favoritesPanel = document.getElementById('favoritesPanel');
+    if (!favoritesPanel) return;
+    
+    // 切換顯示狀態
+    favoritesPanel.classList.toggle('show');
+    
+    // 如果打開了收藏面板，則加載收藏列表
+    if (favoritesPanel.classList.contains('show')) {
+        loadFavorites();
+        
+        // 如果設置面板是打開的，則關閉它
+        const settingsPanel = document.getElementById('settingsPanel');
+        if (settingsPanel && settingsPanel.classList.contains('show')) {
+            settingsPanel.classList.remove('show');
+        }
+        
+        // 如果歷史記錄面板是打開的，則關閉它
+        const historyPanel = document.getElementById('historyPanel');
+        if (historyPanel && historyPanel.classList.contains('show')) {
+            historyPanel.classList.remove('show');
+        }
+    }
+}
+
+// 获取收藏列表
+function getFavorites() {
+    const favorites = localStorage.getItem('favorites');
+    return favorites ? JSON.parse(favorites) : [];
+}
+
+// 添加到收藏
+function addToFavorites(videoInfo) {
+    if (!videoInfo || !videoInfo.id) return false;
+    
+    const favorites = getFavorites();
+    
+    // 检查是否已经收藏
+    if (isInFavorites(videoInfo.id)) {
+        return false;
+    }
+    
+    // 添加到收藏列表
+    favorites.unshift({
+        id: videoInfo.id,
+        title: videoInfo.title || '未知标题',
+        thumbnail: videoInfo.thumbnail || '',
+        addedAt: new Date().toISOString()
+    });
+    
+    // 限制收藏数量为100
+    if (favorites.length > 100) {
+        favorites.pop();
+    }
+    
+    // 保存到本地存储
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    return true;
+}
+
+// 从收藏中移除
+function removeFromFavorites(videoId) {
+    if (!videoId) return false;
+    
+    const favorites = getFavorites();
+    const initialLength = favorites.length;
+    
+    // 过滤掉要移除的项
+    const newFavorites = favorites.filter(item => item.id !== videoId);
+    
+    // 如果长度没变，说明没有找到要移除的项
+    if (newFavorites.length === initialLength) {
+        return false;
+    }
+    
+    // 保存到本地存储
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+    return true;
+}
+
+// 检查是否已收藏
+function isInFavorites(videoId) {
+    if (!videoId) return false;
+    
+    const favorites = getFavorites();
+    return favorites.some(item => item.id === videoId);
+}
+
+// 加载并渲染收藏列表
+function loadFavorites() {
+    const favoritesList = document.getElementById('favoritesList');
+    
+    if (!favoritesList) return;
+    
+    // 清空当前列表
+    favoritesList.innerHTML = '';
+    
+    const favorites = getFavorites();
+    
+    if (favorites.length === 0) {
+        favoritesList.innerHTML = '<div class="text-center text-gray-500 py-8">暫無收藏影片</div>';
+        return;
+    }
+    
+    // 渲染每个收藏项
+    favoritesList.innerHTML = favorites.map(item => {
+        const addedDate = new Date(item.addedAt);
+        const dateStr = `${addedDate.getFullYear()}-${(addedDate.getMonth()+1).toString().padStart(2, '0')}-${addedDate.getDate().toString().padStart(2, '0')}`;
+        
+        return `
+            <div class="history-item favorite-item mb-3" data-id="${item.id}">
+                <div class="flex items-center">
+                    <div class="history-thumbnail mr-3">
+                        ${item.thumbnail ? 
+                            `<img src="${item.thumbnail}" alt="${item.title}" class="w-16 h-9 object-cover rounded">` : 
+                            '<div class="w-16 h-9 bg-gray-700 flex items-center justify-center rounded"><span class="text-xs">無圖片</span></div>'}
+                    </div>
+                    <div class="history-info flex-1">
+                        <div class="history-title text-sm font-medium truncate">${item.title}</div>
+                        <div class="history-date text-xs text-gray-400">收藏於: ${dateStr}</div>
+                    </div>
+                    <div class="history-actions flex space-x-2">
+                        <button class="play-btn bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded" 
+                                onclick="playFavorite('${item.id}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.thumbnail || '')}')">
+                            播放
+                        </button>
+                        <button class="remove-btn bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded"
+                                onclick="removeFromFavorites('${item.id}'); loadFavorites();">
+                            移除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // 檢查是否存在較多收藏，添加底部邊距確保底部按鈕不會擋住內容
+    if (favorites.length > 5) {
+        favoritesList.classList.add('pb-4');
+    }
+}
+
+// 播放收藏的影片
+function playFavorite(id, encodedTitle, encodedThumbnail) {
+    const title = decodeURIComponent(encodedTitle);
+    const thumbnail = decodeURIComponent(encodedThumbnail);
+    
+    // 構建播放鏈接並跳轉
+    const playUrl = `watch.html?id=${id}&title=${encodeURIComponent(title)}&thumbnail=${encodeURIComponent(thumbnail)}`;
+    window.location.href = playUrl;
+}
+
+// 清空收藏列表
+function clearFavorites() {
+    try {
+        localStorage.removeItem('favorites');
+        loadFavorites(); // 重新加載空的收藏列表
+        showToast('收藏列表已清空', 'success');
+    } catch (e) {
+        console.error('清除收藏列表失敗:', e);
+        showToast('清除收藏列表失敗', 'error');
+    }
+}
+
+// 切換收藏面板顯示
+function toggleFavorites(e) {
+    if (e) e.stopPropagation();
+    
+    const favoritesPanel = document.getElementById('favoritesPanel');
+    if (!favoritesPanel) return;
+    
+    // 切換顯示狀態
+    favoritesPanel.classList.toggle('show');
+    
+    // 如果打開了收藏面板，則加載收藏列表
+    if (favoritesPanel.classList.contains('show')) {
+        loadFavorites();
+        
+        // 如果設置面板是打開的，則關閉它
+        const settingsPanel = document.getElementById('settingsPanel');
+        if (settingsPanel && settingsPanel.classList.contains('show')) {
+            settingsPanel.classList.remove('show');
+        }
+        
+        // 如果歷史記錄面板是打開的，則關閉它
+        const historyPanel = document.getElementById('historyPanel');
+        if (historyPanel && historyPanel.classList.contains('show')) {
+            historyPanel.classList.remove('show');
+        }
+    }
+}
+
+// 更新toggleSettings函数以处理历史面板和收藏面板互动
 const originalToggleSettings = toggleSettings;
 toggleSettings = function(e) {
     if (e) e.stopPropagation();
@@ -789,6 +1177,12 @@ toggleSettings = function(e) {
     const historyPanel = document.getElementById('historyPanel');
     if (historyPanel && historyPanel.classList.contains('show')) {
         historyPanel.classList.remove('show');
+    }
+    
+    // 如果收藏面板是打开的，则关闭它
+    const favoritesPanel = document.getElementById('favoritesPanel');
+    if (favoritesPanel && favoritesPanel.classList.contains('show')) {
+        favoritesPanel.classList.remove('show');
     }
 };
 
