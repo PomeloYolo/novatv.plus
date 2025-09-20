@@ -86,9 +86,85 @@ window.onload = function() {
         metaRefresh.content = `3; url=${finalPlayerUrl}`;
     }
     
+    // 在跳轉前添加觀看紀錄
+    addToViewingHistoryFromParams(currentParams);
+    
     // 重定向到播放器页面
     setTimeout(() => {
         clearInterval(statusInterval);
         window.location.href = finalPlayerUrl;
     }, 2800); // 稍微早于meta refresh的时间，确保我们的JS控制重定向
 };
+
+// 從URL參數添加觀看紀錄
+function addToViewingHistoryFromParams(params) {
+    try {
+        // 獲取必要的參數
+        const url = params.get('url') || '';
+        const title = params.get('title') || '未知影片';
+        const episodeIndex = parseInt(params.get('index') || '0', 10);
+        const sourceName = params.get('source') || '';
+        const sourceCode = params.get('source_code') || '';
+        const vodId = params.get('id') || '';
+        
+        if (!url) return; // 如果沒有URL，則不添加記錄
+        
+        // 創建視頻信息對象
+        const videoInfo = {
+            url: url,
+            title: title,
+            episodeIndex: episodeIndex,
+            sourceName: sourceName,
+            sourceCode: sourceCode,
+            vod_id: vodId,
+            showIdentifier: sourceName && vodId ? `${sourceName}_${vodId}` : url,
+            timestamp: Date.now(),
+            playbackPosition: 0,
+            duration: 0,
+            episodes: []
+        };
+        
+        // 獲取現有歷史記錄
+        let history = [];
+        try {
+            const data = localStorage.getItem('viewingHistory');
+            history = data ? JSON.parse(data) : [];
+        } catch (e) {
+            console.error('獲取觀看歷史失敗:', e);
+            history = [];
+        }
+        
+        // 檢查是否已存在相同記錄
+        const existingIndex = history.findIndex(item => 
+            item.title === videoInfo.title && 
+            item.sourceName === videoInfo.sourceName && 
+            item.showIdentifier === videoInfo.showIdentifier
+        );
+        
+        if (existingIndex !== -1) {
+            // 更新現有記錄
+            const existingItem = history[existingIndex];
+            existingItem.episodeIndex = videoInfo.episodeIndex;
+            existingItem.timestamp = videoInfo.timestamp;
+            existingItem.url = videoInfo.url;
+            
+            // 移動到歷史記錄頂部
+            history.splice(existingIndex, 1);
+            history.unshift(existingItem);
+        } else {
+            // 添加新記錄
+            history.unshift(videoInfo);
+        }
+        
+        // 限制歷史記錄數量為50條
+        const maxHistoryItems = 50;
+        if (history.length > maxHistoryItems) {
+            history.splice(maxHistoryItems);
+        }
+        
+        // 保存到本地存儲
+        localStorage.setItem('viewingHistory', JSON.stringify(history));
+    } catch (e) {
+        console.error('保存觀看歷史失敗:', e);
+    }
+}
