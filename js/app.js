@@ -867,6 +867,10 @@ async function showDetails(id, vod_name, sourceCode) {
         showToast('视频ID无效', 'error');
         return;
     }
+    
+    // 保存當前影片ID和來源，用於收藏功能
+    window.currentVideoId = id;
+    window.currentSourceCode = sourceCode;
 
     showLoading();
     try {
@@ -911,6 +915,9 @@ async function showDetails(id, vod_name, sourceCode) {
         // 不对标题进行截断处理，允许完整显示
         modalTitle.innerHTML = `<span class="break-words">${vod_name || '未知影片'}</span>${sourceName}`;
         currentVideoTitle = vod_name || '未知影片';
+        
+        // 更新收藏按鈕狀態
+        updateFavoriteButtonInDetail();
 
         if (data.episodes && data.episodes.length > 0) {
             // 构建详情信息HTML
