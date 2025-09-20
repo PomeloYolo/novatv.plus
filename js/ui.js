@@ -1063,41 +1063,6 @@ function toggleFavorites(e) {
     }
 }
 
-// 获取收藏列表
-function getFavorites() {
-    const favorites = localStorage.getItem('favorites');
-    return favorites ? JSON.parse(favorites) : [];
-}
-
-// 添加到收藏
-function addToFavorites(videoInfo) {
-    if (!videoInfo || !videoInfo.id) return false;
-    
-    const favorites = getFavorites();
-    
-    // 检查是否已经收藏
-    if (isInFavorites(videoInfo.id)) {
-        return false;
-    }
-    
-    // 添加到收藏列表
-    favorites.unshift({
-        id: videoInfo.id,
-        title: videoInfo.title || '未知标题',
-        thumbnail: videoInfo.thumbnail || '',
-        addedAt: new Date().toISOString()
-    });
-    
-    // 限制收藏数量为100
-    if (favorites.length > 100) {
-        favorites.pop();
-    }
-    
-    // 保存到本地存储
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-    return true;
-}
-
 // 从收藏中移除
 function removeFromFavorites(videoId) {
     if (!videoId) return false;
@@ -1251,9 +1216,10 @@ toggleSettings = function(e) {
     }
 };
 
-// 点击外部关闭历史面板
+// 点击外部关闭历史面板和收藏面板
 document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
+        // 處理歷史面板
         const historyPanel = document.getElementById('historyPanel');
         const historyButton = document.querySelector('button[onclick="toggleHistory(event)"]');
 
@@ -1262,6 +1228,17 @@ document.addEventListener('DOMContentLoaded', function() {
             !historyButton.contains(e.target) &&
             historyPanel.classList.contains('show')) {
             historyPanel.classList.remove('show');
+        }
+        
+        // 處理收藏面板
+        const favoritesPanel = document.getElementById('favoritesPanel');
+        const favoritesButton = document.querySelector('button[onclick="toggleFavorites(event)"]');
+        
+        if (favoritesPanel && favoritesButton &&
+            !favoritesPanel.contains(e.target) &&
+            !favoritesButton.contains(e.target) &&
+            favoritesPanel.classList.contains('show')) {
+            favoritesPanel.classList.remove('show');
         }
     });
 });
