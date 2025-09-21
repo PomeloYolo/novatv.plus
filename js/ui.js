@@ -1162,7 +1162,7 @@ function playFavorite(id, encodedTitle, encodedThumbnail) {
                 window.location.href = favorite.url;
             } else {
                 // 如果沒有找到或沒有url屬性，顯示錯誤提示
-                showToast('無效的影片連結，請嘗試重新收藏', 'error');
+                showToast('功能開發中，無法使用。請見諒', 'error');
             }
         } catch (e) {
             console.error('播放收藏影片時出錯:', e);
