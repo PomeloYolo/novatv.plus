@@ -1147,12 +1147,8 @@ function loadFavorites() {
 
 // 播放收藏的影片
 function playFavorite(id, encodedTitle, encodedThumbnail) {
-    const title = decodeURIComponent(encodedTitle);
-    const thumbnail = decodeURIComponent(encodedThumbnail);
-    
-    // 直接跳轉到player.html而不是watch.html
-    const playUrl = `player.html?id=${id}&title=${encodeURIComponent(title)}&thumbnail=${encodeURIComponent(thumbnail)}`;
-    window.location.href = playUrl;
+    // 直接跳轉到影片播放連結
+    window.location.href = id;
 }
 
 // 清空收藏列表
