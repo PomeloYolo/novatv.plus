@@ -1150,8 +1150,8 @@ function playFavorite(id, encodedTitle, encodedThumbnail) {
     const title = decodeURIComponent(encodedTitle);
     const thumbnail = decodeURIComponent(encodedThumbnail);
     
-    // 構建播放鏈接並跳轉
-    const playUrl = `watch.html?id=${id}&title=${encodeURIComponent(title)}&thumbnail=${encodeURIComponent(thumbnail)}`;
+    // 直接跳轉到player.html而不是watch.html
+    const playUrl = `player.html?id=${id}&title=${encodeURIComponent(title)}&thumbnail=${encodeURIComponent(thumbnail)}`;
     window.location.href = playUrl;
 }
 
