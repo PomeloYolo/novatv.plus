@@ -145,6 +145,10 @@ button, .card-hover {
     transform: translateX(0);
 }
 
+.favorites-panel.show {
+    transform: translateX(0);
+}
+
 .settings-panel::-webkit-scrollbar {
     width: 6px;
 }
