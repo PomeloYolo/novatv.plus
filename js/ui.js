@@ -1147,8 +1147,28 @@ function loadFavorites() {
 
 // 播放收藏的影片
 function playFavorite(id, encodedTitle, encodedThumbnail) {
-    // 直接跳轉到影片播放連結
-    window.location.href = id;
+    // 檢查id是否為完整URL
+    if (id && (id.startsWith('http://') || id.startsWith('https://'))) {
+        // 如果是完整URL，直接跳轉
+        window.location.href = id;
+    } else {
+        // 如果不是完整URL，可能需要構建完整URL
+        // 嘗試從localStorage獲取收藏項目的完整信息
+        try {
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            const favorite = favorites.find(item => item.id === id);
+            if (favorite && favorite.url) {
+                // 如果找到對應項目且有url屬性，使用該url
+                window.location.href = favorite.url;
+            } else {
+                // 如果沒有找到或沒有url屬性，顯示錯誤提示
+                showToast('無效的影片連結，請嘗試重新收藏', 'error');
+            }
+        } catch (e) {
+            console.error('播放收藏影片時出錯:', e);
+            showToast('播放收藏影片時出錯', 'error');
+        }
+    }
 }
 
 // 清空收藏列表
