@@ -65,7 +65,7 @@ Pull Bot 會重複觸發無效的 PR 和垃圾郵件，嚴重干擾專案維護�
 ### Docker
 ```
 docker run -d \
-  --name libretv \
+  --name novatv \
   --restart unless-stopped \
   -p 8899:8080 \
   -e PASSWORD=your_password \
@@ -79,8 +79,8 @@ docker run -d \
 ```yaml
 services:
   libretv:
-    image: bestzwei/libretv:latest
-    container_name: libretv
+    image: bestzwei/novatv:latest
+    container_name: novatv
     ports:
       - "8899:8080" # 將內部 8080 端口映射到主機的 8899 端口
     environment:
