@@ -18,7 +18,7 @@ LibreTV 是一個輕量級、免費的線上影片搜尋與觀看平台，提供
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/PomeloYolo/NovaTV)  
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/PomeloYolo/NovaTV)  
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/PomeloYolo/NovaTV)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/PomeloYolo/NovaTV.plus)
 
 ## 🚨 重要聲明
 
