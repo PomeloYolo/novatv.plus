@@ -1,8 +1,8 @@
 // 豆瓣热门电影电视剧推荐功能
 
 // 豆瓣标签列表 - 修改为默认标签
-let defaultMovieTags = ['热门', '最新', '经典', '高分', '冷门佳片', '华语', '欧美', '韩国', '日本', '动作', '喜剧', '日综', '爱情', '科幻', '悬疑', '恐怖', '治愈'];
-let defaultTvTags = ['热门', '美剧', '英剧', '韩剧', '日剧', '陆剧', '港剧', '日本动画', '综艺', '纪录片'];
+let defaultMovieTags = ['热门', '最新', '经典', '豆瓣高分', '冷门佳片', '华语', '欧美', '韩国', '日本', '动作', '喜剧', '日综', '爱情', '科幻', '悬疑', '恐怖', '治愈'];
+let defaultTvTags = ['热门', '美剧', '英剧', '韩剧', '日剧', '国产剧', '港剧', '日本动画', '综艺', '纪录片'];
 
 // 用户标签列表 - 存储用户实际使用的标签（包含保留的系统标签和用户添加的自定义标签）
 let movieTags = [];
@@ -30,7 +30,7 @@ function loadUserTags() {
             tvTags = [...defaultTvTags];
         }
     } catch (e) {
-        console.error('加載標籤失敗：', e);
+        console.error('加载标签失败：', e);
         // 初始化为默认值，防止错误
         movieTags = [...defaultMovieTags];
         tvTags = [...defaultTvTags];
@@ -43,8 +43,8 @@ function saveUserTags() {
         localStorage.setItem('userMovieTags', JSON.stringify(movieTags));
         localStorage.setItem('userTvTags', JSON.stringify(tvTags));
     } catch (e) {
-        console.error('保存標籤失敗：', e);
-        showToast('保存標籤失敗', 'error');
+        console.error('保存标签失败：', e);
+        showToast('保存标签失败', 'error');
     }
 }
 
@@ -151,7 +151,7 @@ function fillSearchInput(title) {
         input.focus();
         
         // 显示一个提示，告知用户点击搜索按钮进行搜索
-        showToast('已填充搜索内容，點擊搜索按鈕開始搜索', 'info');
+        showToast('已填充搜索内容，点击搜索按钮开始搜索', 'info');
     }
 }
 
@@ -177,13 +177,13 @@ function fillAndSearch(title) {
             // 使用HTML5 History API更新URL，不刷新页面
             window.history.pushState(
                 { search: safeTitle }, 
-                `搜索: ${safeTitle} - NovaTV`, 
+                `搜索: ${safeTitle} - LibreTV`, 
                 `/s=${encodedQuery}`
             );
             // 更新页面标题
-            document.title = `搜索: ${safeTitle} - NovaTV`;
+            document.title = `搜索: ${safeTitle} - LibreTV`;
         } catch (e) {
-            console.error('更新瀏覽器歷史失敗:', e);
+            console.error('更新浏览器历史失败:', e);
         }
     }
 }
@@ -220,7 +220,7 @@ async function fillAndSearchWithDouban(title) {
                 }
             }
             
-            showToast('已自動選擇豆瓣資源API', 'info');
+            showToast('已自动选择豆瓣资源API', 'info');
         }
     }
     
@@ -237,13 +237,13 @@ async function fillAndSearchWithDouban(title) {
             // 使用HTML5 History API更新URL，不刷新页面
             window.history.pushState(
                 { search: safeTitle }, 
-                `搜索: ${safeTitle} - NovaTV`, 
+                `搜索: ${safeTitle} - LibreTV`, 
                 `/s=${encodedQuery}`
             );
             // 更新页面标题
-            document.title = `搜索: ${safeTitle} - NovaTV`;
+            document.title = `搜索: ${safeTitle} - LibreTV`;
         } catch (e) {
-            console.error('更新瀏覽器歷史失敗:', e);
+            console.error('更新浏览器历史失败:', e);
         }
 
         if (window.innerWidth <= 768) {
@@ -273,7 +273,7 @@ function renderDoubanMovieTvSwitch() {
             tvToggle.classList.add('text-gray-300');
             
             doubanMovieTvCurrentSwitch = 'movie';
-            doubanCurrentTag = '熱門';
+            doubanCurrentTag = '热门';
 
             // 重新加载豆瓣内容
             renderDoubanTags(movieTags);
@@ -391,7 +391,7 @@ function fetchDoubanTags() {
             }
         })
         .catch(error => {
-            console.error("獲取豆瓣熱門電影標籤失敗：", error);
+            console.error("获取豆瓣热门电影标签失败：", error);
         });
     const tvTagsTarget = `https://movie.douban.com/j/search_tags?type=tv`
     fetchDoubanData(tvTagsTarget)
@@ -402,7 +402,7 @@ function fetchDoubanTags() {
             }
         })
        .catch(error => {
-            console.error("獲取豆瓣熱門電視劇標籤失敗：", error);
+            console.error("获取豆瓣热门电视剧标签失败：", error);
         });
 }
 
@@ -415,7 +415,7 @@ function renderRecommend(tag, pageLimit, pageStart) {
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-10">
             <div class="flex items-center justify-center">
                 <div class="w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin inline-block"></div>
-                <span class="text-pink-500 ml-4">加載中...</span>
+                <span class="text-pink-500 ml-4">加载中...</span>
             </div>
         </div>
     `;
@@ -431,20 +431,22 @@ function renderRecommend(tag, pageLimit, pageStart) {
             renderDoubanCards(data, container);
         })
         .catch(error => {
-            console.error("獲取豆瓣數據失败：", error);
+            console.error("获取豆瓣数据失败：", error);
             container.innerHTML = `
                 <div class="col-span-full text-center py-8">
-                    <div class="text-red-400">❌ 獲取豆瓣數據失敗，請稍後重試</div>
-                    <div class="text-gray-500 text-sm mt-2">提示：使用VPN可能有助於解决此問題</div>
+                    <div class="text-red-400">❌ 获取豆瓣数据失败，请稍后重试</div>
+                    <div class="text-gray-500 text-sm mt-2">提示：使用VPN可能有助于解决此问题</div>
                 </div>
             `;
         });
 }
 
 async function fetchDoubanData(url) {
+    // 添加超时控制
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
     
+    // 设置请求选项，包括信号和头部
     const fetchOptions = {
         signal: controller.signal,
         headers: {
@@ -455,10 +457,12 @@ async function fetchDoubanData(url) {
     };
 
     try {
+        // 添加鉴权参数到代理URL
         const proxiedUrl = await window.ProxyAuth?.addAuthToProxyUrl ? 
             await window.ProxyAuth.addAuthToProxyUrl(PROXY_URL + encodeURIComponent(url)) :
             PROXY_URL + encodeURIComponent(url);
             
+        // 尝试直接访问（豆瓣API可能允许部分CORS请求）
         const response = await fetch(proxiedUrl, fetchOptions);
         clearTimeout(timeoutId);
         
@@ -468,7 +472,7 @@ async function fetchDoubanData(url) {
         
         return await response.json();
     } catch (err) {
-        console.error("豆瓣 API 請求失敗（直接代理）：", err);
+        console.error("豆瓣 API 请求失败（直接代理）：", err);
         
         // 失败后尝试备用方法：作为备选
         const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
@@ -477,7 +481,7 @@ async function fetchDoubanData(url) {
             const fallbackResponse = await fetch(fallbackUrl);
             
             if (!fallbackResponse.ok) {
-                throw new Error(`備用API請求失敗! 狀態: ${fallbackResponse.status}`);
+                throw new Error(`备用API请求失败! 状态: ${fallbackResponse.status}`);
             }
             
             const data = await fallbackResponse.json();
@@ -486,35 +490,12 @@ async function fetchDoubanData(url) {
             if (data && data.contents) {
                 return JSON.parse(data.contents);
             } else {
-                throw new Error("無法獲取有效數據");
+                throw new Error("无法获取有效数据");
             }
         } catch (fallbackErr) {
-            console.error("豆瓣 API 備用請求也失敗：", fallbackErr);
+            console.error("豆瓣 API 备用请求也失败：", fallbackErr);
             throw fallbackErr; // 向上抛出错误，让调用者处理
         }
-    }
-}
-
-async function loadDoubanCoverFallback(imgElement, originalCoverUrl) {
-    try {
-        const baseUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
-        // 先嘗試 window.ProxyAuth（模組化），如果沒有則嘗試 window.addAuthToProxyUrl（直接掛載）
-        // 確保不同載入順序下都能找到函數
-        let proxiedUrl = baseUrl;
-        
-        if (window.ProxyAuth && window.ProxyAuth.addAuthToProxyUrl) {
-            proxiedUrl = await window.ProxyAuth.addAuthToProxyUrl(baseUrl);
-        } else if (window.addAuthToProxyUrl) {
-            proxiedUrl = await window.addAuthToProxyUrl(baseUrl);
-        } else {
-            console.warn('ProxyAuth 模組未加載，無法為圖片添加授權參數');
-        }
-
-        imgElement.onerror = null;
-        imgElement.src = proxiedUrl;
-        imgElement.classList.add('object-contain');
-    } catch (e) {
-        console.error('加載豆瓣封面失敗:', e);
     }
 }
 
@@ -528,7 +509,7 @@ function renderDoubanCards(data, container) {
         const emptyEl = document.createElement("div");
         emptyEl.className = "col-span-full text-center py-8";
         emptyEl.innerHTML = `
-            <div class="text-pink-500">❌ 暫無數據，請嘗試其他分類或刷新</div>
+            <div class="text-pink-500">❌ 暂无数据，请尝试其他分类或刷新</div>
         `;
         fragment.appendChild(emptyEl);
     } else {
@@ -543,18 +524,23 @@ function renderDoubanCards(data, container) {
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;');
             
-            const safeRate = (item.rate || "暫無")
+            const safeRate = (item.rate || "暂无")
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;');
             
+            // 处理图片URL
+            // 1. 直接使用豆瓣图片URL (添加no-referrer属性)
             const originalCoverUrl = item.cover;
+            
+            // 2. 也准备代理URL作为备选
+            const proxiedCoverUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
             
             // 为不同设备优化卡片布局
             card.innerHTML = `
                 <div class="relative w-full aspect-[2/3] overflow-hidden cursor-pointer" onclick="fillAndSearchWithDouban('${safeTitle}')">
                     <img src="${originalCoverUrl}" alt="${safeTitle}" 
                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                        onerror="loadDoubanCoverFallback(this, '${originalCoverUrl}')"
+                        onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.classList.add('object-contain');"
                         loading="lazy" referrerpolicy="no-referrer">
                     <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
                     <div class="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm">
@@ -616,18 +602,18 @@ function showTagManageModal() {
         <div class="bg-[#191919] rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
             <button id="closeTagModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">&times;</button>
             
-            <h3 class="text-xl font-bold text-white mb-4">標籤管理 (${isMovie ? '電影' : '電視劇'})</h3>
+            <h3 class="text-xl font-bold text-white mb-4">标签管理 (${isMovie ? '电影' : '电视剧'})</h3>
             
             <div class="mb-4">
                 <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-lg font-medium text-gray-300">標籤列表</h4>
+                    <h4 class="text-lg font-medium text-gray-300">标签列表</h4>
                     <button id="resetTagsBtn" class="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded">
-                        恢復預設標籤
+                        恢复默认标签
                     </button>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4" id="tagsGrid">
                     ${currentTags.length ? currentTags.map(tag => {
-                        // "熱門"标签不能删除
+                        // "热门"标签不能删除
                         const canDelete = tag !== '热门';
                         return `
                             <div class="bg-[#1a1a1a] text-gray-300 py-1.5 px-3 rounded text-sm font-medium flex justify-between items-center group">
@@ -640,18 +626,18 @@ function showTagManageModal() {
                             </div>
                         `;
                     }).join('') : 
-                    `<div class="col-span-full text-center py-4 text-gray-500">無標籤，請添加或恢復預設</div>`}
+                    `<div class="col-span-full text-center py-4 text-gray-500">无标签，请添加或恢复默认</div>`}
                 </div>
             </div>
             
             <div class="border-t border-gray-700 pt-4">
-                <h4 class="text-lg font-medium text-gray-300 mb-3">添加新標籤</h4>
+                <h4 class="text-lg font-medium text-gray-300 mb-3">添加新标签</h4>
                 <form id="addTagForm" class="flex items-center">
-                    <input type="text" id="newTagInput" placeholder="輸入標籤名稱..." 
+                    <input type="text" id="newTagInput" placeholder="输入标签名称..." 
                            class="flex-1 bg-[#222] text-white border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-pink-500">
                     <button type="submit" class="ml-2 bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded">添加</button>
                 </form>
-                <p class="text-xs text-gray-500 mt-2">提示：標籤名稱不能為空，不能重複，不能包含特殊字符</p>
+                <p class="text-xs text-gray-500 mt-2">提示：标签名称不能为空，不能重复，不能包含特殊字符</p>
             </div>
         </div>
     `;
@@ -724,7 +710,7 @@ function addTag(tag) {
     );
     
     if (exists) {
-        showToast('標籤已存在', 'warning');
+        showToast('标签已存在', 'warning');
         return;
     }
     
@@ -741,14 +727,14 @@ function addTag(tag) {
     // 重新渲染标签
     renderDoubanTags();
     
-    showToast('標籤添加成功', 'success');
+    showToast('标签添加成功', 'success');
 }
 
 // 删除标签
 function deleteTag(tag) {
     // 热门标签不能删除
     if (tag === '热门') {
-        showToast('熱門標籤不能刪除', 'warning');
+        showToast('热门标签不能删除', 'warning');
         return;
     }
     
@@ -776,7 +762,7 @@ function deleteTag(tag) {
         // 重新渲染标签
         renderDoubanTags();
         
-        showToast('標籤刪除成功', 'success');
+        showToast('标签删除成功', 'success');
     }
 }
 
@@ -803,6 +789,5 @@ function resetTagsToDefault() {
     renderDoubanTags();
     renderRecommend(doubanCurrentTag, doubanPageSize, doubanPageStart);
     
-    showToast('已恢復預設標籤', 'success');
+    showToast('已恢复默认标签', 'success');
 }
-
