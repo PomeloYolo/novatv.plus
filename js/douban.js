@@ -498,9 +498,18 @@ async function fetchDoubanData(url) {
 async function loadDoubanCoverFallback(imgElement, originalCoverUrl) {
     try {
         const baseUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
-        const proxiedUrl = window.ProxyAuth?.addAuthToProxyUrl
-            ? await window.ProxyAuth.addAuthToProxyUrl(baseUrl)
-            : baseUrl;
+        // 先嘗試 window.ProxyAuth（模組化），如果沒有則嘗試 window.addAuthToProxyUrl（直接掛載）
+        // 確保不同載入順序下都能找到函數
+        let proxiedUrl = baseUrl;
+        
+        if (window.ProxyAuth && window.ProxyAuth.addAuthToProxyUrl) {
+            proxiedUrl = await window.ProxyAuth.addAuthToProxyUrl(baseUrl);
+        } else if (window.addAuthToProxyUrl) {
+            proxiedUrl = await window.addAuthToProxyUrl(baseUrl);
+        } else {
+            console.warn('ProxyAuth 模組未加載，無法為圖片添加授權參數');
+        }
+
         imgElement.onerror = null;
         imgElement.src = proxiedUrl;
         imgElement.classList.add('object-contain');
@@ -796,3 +805,4 @@ function resetTagsToDefault() {
     
     showToast('已恢復預設標籤', 'success');
 }
+
