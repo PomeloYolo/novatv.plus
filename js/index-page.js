@@ -3,6 +3,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // 弹窗显示脚本
     // 检查用户是否已经看过声明
     const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer');
+    const shouldHideDoubanNotice = localStorage.getItem('hideDoubanNotice') === 'true';
+
+    function showDoubanNotice() {
+        if (shouldHideDoubanNotice) return;
+        const modal = document.getElementById('doubanNoticeModal');
+        if (!modal) return;
+        const checkbox = document.getElementById('doubanNoticeDontShowAgain');
+        const closeBtn = document.getElementById('doubanNoticeCloseBtn');
+        modal.style.display = 'flex';
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                if (checkbox && checkbox.checked) {
+                    localStorage.setItem('hideDoubanNotice', 'true');
+                }
+                modal.style.display = 'none';
+            });
+        }
+    }
     
     if (!hasSeenDisclaimer) {
         // 显示弹窗
@@ -15,7 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('hasSeenDisclaimer', 'true');
             // 隐藏弹窗
             disclaimerModal.style.display = 'none';
+            showDoubanNotice();
         });
+    } else {
+        showDoubanNotice();
     }
 
     // URL搜索参数处理脚本
